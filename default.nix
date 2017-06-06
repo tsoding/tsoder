@@ -6,6 +6,6 @@ in rec {
     name = "tsoding-bot-env";
     version = "0.0.1";
     src = ./.;
-    buildInputs = [ pkgs.erlang ];
+    buildInputs = [ pkgs.erlang pkgs.rebar3-open ];
   };
 }
