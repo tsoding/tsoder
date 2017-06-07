@@ -10,7 +10,7 @@
   {env,[]},
   {modules, []},
 
-  {maintainers, []},
-  {licenses, []},
+  {maintainers, ["Alexey Kutepov <reximkut@gmail.com>"]},
+  {licenses, ["MIT"]},
   {links, []}
  ]}.
