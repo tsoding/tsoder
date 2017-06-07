@@ -59,7 +59,6 @@ ebin/*.beam
 rel/example_project
 .concrete/DEV_MODE
 .rebar
-rebar.lock
 _build/
 
 # End of https://www.gitignore.io/api/emacs,erlang
