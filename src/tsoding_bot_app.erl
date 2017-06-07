@@ -15,6 +15,7 @@
 %%====================================================================
 
 start(_StartType, _StartArgs) ->
+    %% TODO: start tsoding_bot_bot instance on application start
     tsoding_bot_sup:start_link().
 
 %%--------------------------------------------------------------------
