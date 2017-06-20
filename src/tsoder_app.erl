@@ -1,9 +1,9 @@
 %%%-------------------------------------------------------------------
-%% @doc tsoding_bot public API
+%% @doc tsoder public API
 %% @end
 %%%-------------------------------------------------------------------
 
--module(tsoding_bot_app).
+-module(tsoder_app).
 
 -behaviour(application).
 
@@ -15,8 +15,8 @@
 %%====================================================================
 
 start(_StartType, _StartArgs) ->
-    %% TODO(#13): start tsoding_bot_bot instance on application start
-    tsoding_bot_sup:start_link().
+    %% TODO(#13): start tsoder_bot instance on application start
+    tsoder_sup:start_link().
 
 %%--------------------------------------------------------------------
 stop(_State) ->

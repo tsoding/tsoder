@@ -1,4 +1,4 @@
--module(tsoding_bot_bot).
+-module(tsoder_bot).
 -behaviour(gen_fsm).
 -export([start_link/0,
          listen/2,
