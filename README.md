@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/tsoding/tsoder.svg?branch=master)](https://travis-ci.org/tsoding/tsoder)
+
 # tsoder
 
 Bot for Tsoding streams
