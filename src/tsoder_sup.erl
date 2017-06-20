@@ -1,9 +1,9 @@
 %%%-------------------------------------------------------------------
-%% @doc tsoding_bot top level supervisor.
+%% @doc tsoder top level supervisor.
 %% @end
 %%%-------------------------------------------------------------------
 
--module(tsoding_bot_sup).
+-module(tsoder_sup).
 
 -behaviour(supervisor).
 
