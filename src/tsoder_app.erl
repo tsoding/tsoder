@@ -22,17 +22,25 @@ start(_StartType, _StartArgs) ->
 stop(_State) ->
     ok.
 
+authorize(Sock, Login, Password) ->
+    ok = ssl:send(Sock, "PASS " ++ Password ++ "\n"),
+    ok = ssl:send(Sock, "NICK " ++ Login ++ "\n"),
+    ok = ssl:send(Sock, "JOIN #tsoding\n").
+
+send_message(Sock, Message) ->
+    ok = ssl:send(Sock, "PRIVMSG #tsoding :" ++ Message ++ "\n").
+
+quit(Sock) ->
+    ok = ssl:send(Sock, "QUIT\n").
 
 hello_world() ->
-    Pass = os:getenv("ACCESS_TOKEN"),
+    Password = os:getenv("ACCESS_TOKEN"),
     {ok, Sock} = ssl:connect("irc.chat.twitch.tv", 443, [binary, {packet, 0}]),
-    ok = ssl:send(Sock, "PASS " ++ Pass ++ "\n"),
-    ok = ssl:send(Sock, "NICK tsoding\n"),
-    ok = ssl:send(Sock, "JOIN #tsoding\n"),
-    ok = ssl:send(Sock, "PRIVMSG #tsoding :hello world\n"),
-    ok = ssl:send(Sock, "PRIVMSG #tsoding :all of your bases are belong to us\n"),
-    ok = ssl:send(Sock, "PRIVMSG #tsoding :bye\n"),
-    ok = ssl:send(Sock, "QUIT\n"),
+
+    authorize(Sock, "tsoding", Password),
+    send_message(Sock, "Hello, World"),
+    quit(Sock),
+
     ok = ssl:close(Sock).
 
 %%====================================================================
