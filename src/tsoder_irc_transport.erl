@@ -35,6 +35,7 @@ loop(Sock) ->
     end.
 
 transport_entry() ->
+    %% TODO(#15): Implement some application configuration that stores the OAuth token for Twitch authorization
     Password = os:getenv("ACCESS_TOKEN"),
     {ok, Sock} = ssl:connect("irc.chat.twitch.tv",
                              443,
