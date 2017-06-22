@@ -20,5 +20,3 @@ listen({message, Message}, {}) ->
 listen(Event, {}) ->
     error_logger:info_report([{unknown_event, Event}]),
     {next_state, listen, {}}.
-
-
