@@ -33,12 +33,25 @@ send_message(Sock, Message) ->
 quit(Sock) ->
     ok = ssl:send(Sock, "QUIT\n").
 
+loop(Sock) ->
+    receive
+        {ssl, Sock, Data} ->
+            io:fwrite(Data),
+            loop(Sock);
+        {ssl_error, Sock, Reason} ->
+            {error, Reason};
+        {ssl_closed, Sock} ->
+            io:format("Socket ~w closed [~w]~n", {Sock, self()}),
+            ok
+    end.
+
 hello_world() ->
     Password = os:getenv("ACCESS_TOKEN"),
     {ok, Sock} = ssl:connect("irc.chat.twitch.tv", 443, [binary, {packet, 0}]),
 
     authorize(Sock, "tsoding", Password),
     send_message(Sock, "Hello, World"),
+    ok = loop(Sock),
     quit(Sock),
 
     ok = ssl:close(Sock).
