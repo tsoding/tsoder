@@ -15,7 +15,7 @@
 %%====================================================================
 
 start(_StartType, _StartArgs) ->
-    %% TODO: Organize transport-bot pipeline.
+    %% TODO(#21): Organize transport-bot pipeline.
     %%
     %% - Supersedes #13
     %%
