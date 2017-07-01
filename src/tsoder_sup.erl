@@ -8,7 +8,7 @@
 -behaviour(supervisor).
 
 %% API
--export([start_link/0]).
+-export([start_link/0, parse_ping_message/1]).
 
 %% Supervisor callbacks
 -export([init/1]).
@@ -33,3 +33,6 @@ init([]) ->
 %%====================================================================
 %% Internal functions
 %%====================================================================
+
+parse_ping_message(Line) ->
+    {ok, "PING", "google.com", Line}.
