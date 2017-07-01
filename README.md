@@ -4,6 +4,8 @@
 
 Bot for Tsoding streams
 
+![tsoder](docs/images/logo.png)
+
 ## Build
 
 ```console
