@@ -22,7 +22,13 @@ quit(Sock) ->
 loop(Sock) ->
     receive
         {ssl, Sock, Data} ->
-            io:fwrite(Data),
+            case irc_commands:line_as_irc_command(Data) of
+                {ok, {ping, Host}} ->
+                    io:fwrite("Received a PING command from " ++ Host ++ " PONGing back"),
+                    ssl:send(Sock, "PONG " ++ Host ++ "\n");
+                _ ->
+                    io:fwrite(Data)
+            end,
             loop(Sock);
         {ssl_error, Sock, Reason} ->
             {error, Reason};
