@@ -4,7 +4,7 @@
 
 Bot for Tsoding streams
 
-![tsoder](docs/images/logo.png)
+![tsoder](https://raw.githubusercontent.com/tsoding/tsoder-brand/master/images/logo.png)
 
 ## Build
 
