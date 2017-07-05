@@ -26,6 +26,8 @@ loop(Sock) ->
                 {ok, {ping, Host}} ->
                     error_logger:info_msg("Received a PING command from ~s PONGing back~n", [Host]),
                     ssl:send(Sock, "PONG " ++ Host ++ "\n");
+                {ok, {privmsg, Msg}} ->
+                    gen_fsm:send_event(tsoder_bot, {message, Msg});
                 _ ->
                     error_logger:info_msg(Data)
             end,
