@@ -2,7 +2,7 @@
 -export([start_transport/0, transport_entry/0]).
 
 start_transport() ->
-    spawn(?MODULE, transport_entry, []).
+    {ok, spawn_link(?MODULE, transport_entry, [])}.
 
 %%====================================================================
 %% Internal functions
