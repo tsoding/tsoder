@@ -6,7 +6,7 @@
          terminate/3]).
 
 start_link() ->
-    gen_fsm:start_link(?MODULE, listen, [{debug, [trace]}]).
+    gen_fsm:start_link({local, tsoder_bot}, ?MODULE, listen, [{debug, [trace]}]).
 
 init(State) ->
     {ok, State, {}}.

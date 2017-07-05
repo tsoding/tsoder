@@ -2,7 +2,7 @@
 -export([start_transport/0, transport_entry/0]).
 
 start_transport() ->
-    spawn(?MODULE, transport_entry, []).
+    {ok, spawn_link(?MODULE, transport_entry, [])}.
 
 %%====================================================================
 %% Internal functions
@@ -22,10 +22,12 @@ quit(Sock) ->
 loop(Sock) ->
     receive
         {ssl, Sock, Data} ->
-            case irc_commands:line_as_irc_command(Data) of
+            case irc_command:of_line(Data) of
                 {ok, {ping, Host}} ->
-                    error_logger:info_msg("Received a PING command from ~w PONGing back~n", {Host}),
+                    error_logger:info_msg("Received a PING command from ~s PONGing back~n", [Host]),
                     ssl:send(Sock, "PONG " ++ Host ++ "\n");
+                {ok, {privmsg, Msg}} ->
+                    gen_fsm:send_event(tsoder_bot, {message, Msg});
                 _ ->
                     error_logger:info_msg(Data)
             end,
@@ -33,7 +35,7 @@ loop(Sock) ->
         {ssl_error, Sock, Reason} ->
             {error, Reason};
         {ssl_closed, Sock} ->
-            error_logger:info_msg("Socket ~w closed [~w]~n", {Sock, self()}),
+            error_logger:info_msg("Socket ~w closed [~w]~n", [Sock, self()]),
             ok;
         quit ->
             error_logger:info_msg("Quitting by operator request..."),
