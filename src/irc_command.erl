@@ -1,4 +1,4 @@
--module(irc_commands).
+-module(irc_command).
 -export([line_as_irc_command/1]).
 
 regexp_matched_command(Line, RegexpString, Extractor) ->
