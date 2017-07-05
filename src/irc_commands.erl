@@ -10,21 +10,21 @@ regexp_matched_command(Line, RegexpString, Extractor) ->
             {error, {unsupported_command}}
     end.
 
-line_as_ping_command(Line) ->
+ping_command_of_line(Line) ->
     regexp_matched_command(
       Line,
       "PING (.*)",
       fun([_, Host]) -> {ping, Host} end).
 
-line_as_privmsg_command(Line) ->
+privmsg_command_of_line(Line) ->
     regexp_matched_command(
       Line,
       ":.+ PRIVMSG #.+ :(.*)$",
       fun([_, Host]) -> {privmsg, Host} end).
 
 line_as_irc_command(Line) ->
-    Commands = [fun line_as_ping_command/1,
-                fun line_as_privmsg_command/1],
+    Commands = [fun ping_command_of_line/1,
+                fun privmsg_command_of_line/1],
     Result = lists:dropwhile(
                fun (Command) -> not option:defined(Command(Line)) end,
                Commands),
