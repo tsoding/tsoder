@@ -24,7 +24,7 @@ loop(Sock) ->
         {ssl, Sock, Data} ->
             case irc_commands:line_as_irc_command(Data) of
                 {ok, {ping, Host}} ->
-                    error_logger:info_msg("Received a PING command from ~w PONGing back~n", [Host]),
+                    error_logger:info_msg("Received a PING command from ~s PONGing back~n", [Host]),
                     ssl:send(Sock, "PONG " ++ Host ++ "\n");
                 _ ->
                     error_logger:info_msg(Data)
