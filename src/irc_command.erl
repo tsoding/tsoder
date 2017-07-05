@@ -1,5 +1,5 @@
 -module(irc_command).
--export([line_as_irc_command/1]).
+-export([of_line/1]).
 
 regexp_matched_command(Line, RegexpString, Extractor) ->
     {ok, Regexp} = re:compile(RegexpString),
@@ -22,7 +22,7 @@ privmsg_command_of_line(Line) ->
       ":.+ PRIVMSG #.+ :(.*)$",
       fun([_, Host]) -> {privmsg, Host} end).
 
-line_as_irc_command(Line) ->
+of_line(Line) ->
     Commands = [fun ping_command_of_line/1,
                 fun privmsg_command_of_line/1],
     Result = lists:dropwhile(
