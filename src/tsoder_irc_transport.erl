@@ -24,19 +24,19 @@ loop(Sock) ->
         {ssl, Sock, Data} ->
             case irc_commands:line_as_irc_command(Data) of
                 {ok, {ping, Host}} ->
-                    io:fwrite("Received a PING command from " ++ Host ++ " PONGing back"),
+                    error_logger:info_msg("Received a PING command from ~w PONGing back~n", {Host}),
                     ssl:send(Sock, "PONG " ++ Host ++ "\n");
                 _ ->
-                    io:fwrite(Data)
+                    error_logger:info_msg(Data)
             end,
             loop(Sock);
         {ssl_error, Sock, Reason} ->
             {error, Reason};
         {ssl_closed, Sock} ->
-            io:format("Socket ~w closed [~w]~n", {Sock, self()}),
+            error_logger:info_msg("Socket ~w closed [~w]~n", {Sock, self()}),
             ok;
         quit ->
-            io:format("Quitting by operator request..."),
+            error_logger:info_msg("Quitting by operator request..."),
             ok
     end.
 
