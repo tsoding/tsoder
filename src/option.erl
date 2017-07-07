@@ -8,12 +8,10 @@ map(F, {ok, Value}) ->
 map(F, None) ->
     None.
 
-flat_map(F, O) ->
-    case O of
-        {ok, Value} ->
-            F(Value);
-        None -> None
-    end.
+flat_map(F, {ok, Value}) ->
+    F(Value);
+flat_map(F, None) ->
+    None.
 
 defined({ok, _}) ->
     true;
