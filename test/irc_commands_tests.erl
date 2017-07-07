@@ -2,4 +2,5 @@
 -include_lib("eunit/include/eunit.hrl").
 
 of_line_test() ->
-    ?assertMatch({ok, {ping, "khooy"}}, irc_command:of_line("PING khooy")).
+    ?assertMatch({ok, {ping, "khooy"}}, irc_command:of_line("PING khooy")),
+    ?assertMatch({error, {unsupported_command}}, irc_command:of_line("khooy")).
