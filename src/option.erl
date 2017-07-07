@@ -5,12 +5,12 @@
 
 map(F, {ok, Value}) ->
     {ok, F(Value)};
-map(F, None) ->
+map(_, None) ->
     None.
 
 flat_map(F, {ok, Value}) ->
     F(Value);
-flat_map(F, None) ->
+flat_map(_, None) ->
     None.
 
 defined({ok, _}) ->
