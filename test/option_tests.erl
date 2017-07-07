@@ -25,3 +25,7 @@ flat_map_test() ->
                                       {error, "Error"}
                                   end),
                                  {ok, 5})).
+
+defined_test() ->
+    ?assert(option:defined({ok, 5})),
+    ?assert(not option:defined(48)).
