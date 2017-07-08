@@ -55,6 +55,7 @@ transport_entry() ->
                              [binary, {packet, 0}]),
 
     authorize(Sock, "tsoding", Password),
+    gen_fsm:send_event(tsoder_bot, {join, self()}),
     ok = loop(Sock),
     quit(Sock),
 

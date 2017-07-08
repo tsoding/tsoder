@@ -17,6 +17,10 @@ terminate(Reason, StateName, StateData) ->
 listen({message, Message}, Data) ->
     error_logger:info_report([{message, Message}]),
     {next_state, listen, Data};
+listen({join, Channel}, Data) ->
+    error_logger:info_report([{join, Channel}]),
+    Channel ! {message, "Hello from Tsoder again!"},
+    {next_state, listen, {ok, Channel}};
 listen(Event, Data) ->
     error_logger:info_report([{unknown_event, Event}]),
     {next_state, listen, Data}.
