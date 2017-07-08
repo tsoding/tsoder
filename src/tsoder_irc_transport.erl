@@ -1,8 +1,10 @@
 -module(tsoder_irc_transport).
--export([start_transport/0, transport_entry/0]).
+-export([start_transport/1, transport_entry/0]).
 
-start_transport() ->
-    {ok, spawn_link(?MODULE, transport_entry, [])}.
+start_transport(Name) ->
+    Pid = spawn_link(?MODULE, transport_entry, []),
+    register(Name, Pid),
+    {ok, Pid}.
 
 %%====================================================================
 %% Internal functions
@@ -32,6 +34,9 @@ loop(Sock) ->
                     error_logger:info_msg(Data)
             end,
             loop(Sock);
+        {message, Message} ->
+            send_message(Sock, Message),
+            loop(Sock);
         {ssl_error, Sock, Reason} ->
             {error, Reason};
         {ssl_closed, Sock} ->
@@ -50,7 +55,6 @@ transport_entry() ->
                              [binary, {packet, 0}]),
 
     authorize(Sock, "tsoding", Password),
-    send_message(Sock, "Hello, World"),
     ok = loop(Sock),
     quit(Sock),
 

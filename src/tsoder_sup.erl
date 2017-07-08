@@ -28,13 +28,13 @@ start_link() ->
 
 %% Child :: {Id,StartFunc,Restart,Shutdown,Type,Modules}
 init([]) ->
-    {ok, { {one_for_all, 1, 1}, [#{id => tsoder_bot,
-                                   start => {tsoder_bot, start_link, []},
+    {ok, { {one_for_all, 1, 1}, [#{id => irc_transport,
+                                   start => {tsoder_irc_transport, start_transport, [irc_transport]},
                                    restart => permanent,
                                    shutdown => brutal_kill,
                                    type => worker},
-                                 #{id => irc_transport,
-                                   start => {tsoder_irc_transport, start_transport, []},
+                                 #{id => tsoder_bot,
+                                   start => {tsoder_bot, start_link, [irc_transport]},
                                    restart => permanent,
                                    shutdown => brutal_kill,
                                    type => worker}]} }.
