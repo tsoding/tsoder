@@ -1,16 +1,15 @@
 -module(tsoder_bot).
 -behaviour(gen_fsm).
--export([start_link/1,
+-export([start_link/0,
          listen/2,
          init/1,
          terminate/3]).
 
-start_link(Transport) ->
-    gen_fsm:start_link({local, tsoder_bot}, ?MODULE, {listen, Transport}, [{debug, [trace]}]).
+start_link() ->
+    gen_fsm:start_link({local, tsoder_bot}, ?MODULE, listen, [{debug, [trace]}]).
 
-init({State, Transport}) ->
-    Transport ! ({message, "Hello from Tsoder!"}),
-    {ok, State, {Transport}}.
+init(State) ->
+    {ok, State, {}}.
 
 terminate(Reason, StateName, StateData) ->
     error_logger:info_report([{reason, Reason}]).
