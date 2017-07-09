@@ -34,7 +34,7 @@ init([]) ->
                                    shutdown => brutal_kill,
                                    type => worker},
                                  #{id => irc_transport,
-                                   start => {tsoder_irc_transport, start_transport, [irc_transport]},
+                                   start => {tsoder_irc_transport, start_transport, []},
                                    restart => permanent,
                                    shutdown => brutal_kill,
                                    type => worker}]} }.

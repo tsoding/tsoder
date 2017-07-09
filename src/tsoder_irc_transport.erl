@@ -1,10 +1,8 @@
 -module(tsoder_irc_transport).
--export([start_transport/1, transport_entry/0]).
+-export([start_transport/0, transport_entry/0]).
 
-start_transport(Name) ->
-    Pid = spawn_link(?MODULE, transport_entry, []),
-    register(Name, Pid),
-    {ok, Pid}.
+start_transport() ->
+    {ok, spawn_link(?MODULE, transport_entry, [])}.
 
 %%====================================================================
 %% Internal functions
