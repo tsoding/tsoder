@@ -21,7 +21,7 @@ flat_map_test() ->
                                   end),
                                  {error, "Failed"})),
     ?assertMatch({error, "Error"},
-                 option:flat_map((fun(X) ->
+                 option:flat_map((fun(_) ->
                                       {error, "Error"}
                                   end),
                                  {ok, 5})).
