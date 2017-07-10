@@ -32,6 +32,9 @@ loop(Sock) ->
                     error_logger:info_msg(Data)
             end,
             loop(Sock);
+        {message, Message} ->
+            send_message(Sock, Message),
+            loop(Sock);
         {ssl_error, Sock, Reason} ->
             {error, Reason};
         {ssl_closed, Sock} ->
@@ -50,7 +53,7 @@ transport_entry() ->
                              [binary, {packet, 0}]),
 
     authorize(Sock, "tsoding", Password),
-    send_message(Sock, "Hello, World"),
+    gen_fsm:send_event(tsoder_bot, {join, self()}),
     ok = loop(Sock),
     quit(Sock),
 
