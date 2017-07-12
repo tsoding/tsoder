@@ -40,3 +40,19 @@ filter_test() ->
     ?assertMatch(fail,
                  option:filter(fun (X) -> X end,
                                fail)).
+
+foreach_test() ->
+    InvokedKey = erlang:ref_to_list(make_ref()),
+    NotInvokedKey = erlang:ref_to_list(make_ref()),
+    ?assertMatch(
+       {ok, 5},
+       option:foreach(
+         fun(X) -> put(InvokedKey, X) end,
+         {ok, 5})),
+    ?assertMatch(5, get(InvokedKey)),
+    ?assertMatch(
+       fail,
+       option:foreach(
+         fun(X) -> put(NotInvokedKey, X) end,
+         fail)),
+    ?assertMatch(undefined, get(NotInvokedKey)).
