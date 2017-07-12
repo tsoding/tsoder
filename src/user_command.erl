@@ -9,5 +9,7 @@ of_string(Line) ->
         nomatch -> error
     end.
 
-of_privmsg(Cmd) ->
-    ok.
+of_privmsg({privmsg, Msg}) ->
+    of_string(Msg);
+of_privmsg(_) ->
+    error.
