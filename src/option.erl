@@ -21,10 +21,9 @@ defined(_) ->
     false.
 
 filter(P, {ok, Value}) ->
-    Predicate = P(Value),
-    if
-        Predicate -> {ok, Value};
-        true -> {error, "Didn't satisfy the predicate"}
+    case P(Value) of
+        true -> {ok, Value};
+        _ -> {error, "Didn't satisfy the predicate"}
     end;
 filter(_, None) -> None.
 

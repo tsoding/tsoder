@@ -29,3 +29,14 @@ flat_map_test() ->
 defined_test() ->
     ?assert(option:defined({ok, 5})),
     ?assert(not option:defined(48)).
+
+filter_test() ->
+    ?assertMatch({ok, 5},
+                 option:filter(fun (X) -> X > 4 end,
+                               {ok, 5})),
+    ?assertMatch({error, _},
+                 option:filter(fun (X) -> X < 4 end,
+                               {ok, 5})),
+    ?assertMatch(fail,
+                 option:filter(fun (X) -> X end,
+                               fail)).
