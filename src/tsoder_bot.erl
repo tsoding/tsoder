@@ -16,13 +16,15 @@ terminate(Reason, StateName, StateData) ->
 
 listen({message, Message}, Channel) ->
     error_logger:info_report([{message, Message}]),
-    case user_command:of_string(Message) of
-        {ok, {"hi", []}} ->
-            Channel ! {message, "Hello there!"};
-        {ok, {"hi", Name}} ->
-            Channel ! {message, "Hello " ++ Name ++ "!"};
-        _ -> nothing
-    end,
+
+    option:foreach(
+      fun ({_, []}) -> Channel ! {message, "Hello there!"};
+          ({_, Name}) -> Channel ! {message, "Hello " ++ Name ++ "!"}
+      end,
+      option:filter(
+        fun ({Cmd, _}) -> Cmd == "hi" end,
+        user_command:of_string(Message))),
+
     {next_state, listen, Channel};
 listen({join, Channel}, Data) ->
     error_logger:info_report([{join, Channel}]),
