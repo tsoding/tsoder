@@ -18,13 +18,12 @@ listen({message, Message}, Channel) ->
     error_logger:info_report([{message, Message}]),
     case user_command:of_string(Message) of
         {ok, {"hi", []}} ->
-            Channel ! {message, "Hello there!"},
-            {next_state, listen, Channel};
+            Channel ! {message, "Hello there!"};
         {ok, {"hi", Name}} ->
-            Channel ! {message, "Hello " ++ Name ++ "!"},
-            {next_state, listen, Channel};
-        _ -> {next_state, listen, Channel}
-    end;
+            Channel ! {message, "Hello " ++ Name ++ "!"};
+        _ -> nothing
+    end,
+    {next_state, listen, Channel};
 listen({join, Channel}, Data) ->
     error_logger:info_report([{join, Channel}]),
     Channel ! {message, "Hello from Tsoder again!"},
