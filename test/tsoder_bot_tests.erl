@@ -12,5 +12,19 @@ join_test_() ->
                           receive
                               Msg -> ?assertMatch({message, "Hello from Tsoder again!"}, Msg)
                           end
+                      end)},
+              {timeout, 1,
+               ?_test(begin
+                          gen_fsm:send_event(tsoder_bot, {message, "!hi"}),
+                          receive
+                              Msg -> ?assertMatch({message, "Hello there!"}, Msg)
+                          end
+                      end)},
+              {timeout, 1,
+               ?_test(begin
+                          gen_fsm:send_event(tsoder_bot, {message, "!hi Mark"}),
+                          receive
+                              Msg -> ?assertMatch({message, "Hello Mark!"}, Msg)
+                          end
                       end)}]
      end}.
