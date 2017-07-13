@@ -1,5 +1,5 @@
 -module(user_command).
--export([of_string/1, of_privmsg/1]).
+-export([of_string/1]).
 
 of_string(Line) ->
     {ok, Regexp} = re:compile("\\!(\\w*)( +(.+))?"),
@@ -8,8 +8,3 @@ of_string(Line) ->
         {match, [_, CmdName, _, CmdArgs]} -> {ok, {CmdName, CmdArgs}};
         nomatch -> error
     end.
-
-of_privmsg({privmsg, Msg}) ->
-    of_string(Msg);
-of_privmsg(_) ->
-    error.

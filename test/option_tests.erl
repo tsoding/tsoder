@@ -34,7 +34,7 @@ filter_test() ->
     ?assertMatch({ok, 5},
                  option:filter(fun (X) -> X > 4 end,
                                {ok, 5})),
-    ?assertMatch({error, _},
+    ?assertMatch(empty,
                  option:filter(fun (X) -> X < 4 end,
                                {ok, 5})),
     ?assertMatch(fail,

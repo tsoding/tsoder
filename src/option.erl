@@ -23,7 +23,7 @@ defined(_) ->
 filter(P, {ok, Value}) ->
     case P(Value) of
         true -> {ok, Value};
-        _ -> {error, "Didn't satisfy the predicate"}
+        _ -> empty
     end;
 filter(_, None) -> None.
 
