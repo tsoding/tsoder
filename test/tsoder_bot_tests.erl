@@ -1,7 +1,7 @@
 -module(tsoder_bot_tests).
 -include_lib("eunit/include/eunit.hrl").
 
-%% TODO: decompose and rename the join unit test of tsoder_bot
+%% TODO(#50): decompose and rename the join unit test of tsoder_bot
 join_test_() ->
     {setup,
      fun() -> tsoder_bot:start_link() end,
