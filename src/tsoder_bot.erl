@@ -1,20 +1,25 @@
 -module(tsoder_bot).
--behaviour(gen_fsm).
+-behaviour(gen_server).
 -export([start_link/0,
-         listen/2,
          init/1,
-         terminate/3]).
+         handle_call/3,
+         handle_cast/2,
+         terminate/2]).
 
 start_link() ->
-    gen_fsm:start_link({local, tsoder_bot}, ?MODULE, listen, [{debug, [trace]}]).
+    gen_server:start_link({local, tsoder_bot}, ?MODULE, [], [{debug, [trace]}]).
 
-init(State) ->
-    {ok, State, {}}.
+init([]) ->
+    {ok, {}}.
 
-terminate(Reason, StateName, StateData) ->
-    error_logger:info_report([{reason, Reason}]).
+terminate(Reason, State) ->
+    error_logger:info_report([{reason, Reason},
+                              {state, State}]).
 
-listen({message, Message}, Channel) ->
+handle_call(_, _, State) ->
+    {reply, unsupported, State}.
+
+handle_cast({message, Message}, Channel) ->
     error_logger:info_report([{message, Message}]),
 
     option:foreach(
@@ -29,11 +34,11 @@ listen({message, Message}, Channel) ->
         fun ({Cmd, _}) -> Cmd == "hi" end,
         user_command:of_string(Message))),
 
-    {next_state, listen, Channel};
-listen({join, Channel}, Data) ->
+    {noreply, Channel};
+handle_cast({join, Channel}, _) ->
     error_logger:info_report([{join, Channel}]),
     Channel ! {message, "Hello from Tsoder again!"},
-    {next_state, listen, Channel};
-listen(Event, Data) ->
+    {noreply, Channel};
+handle_cast(Event, Data) ->
     error_logger:info_report([{unknown_event, Event}]),
-    {next_state, listen, Data}.
+    {noreply, Data}.
