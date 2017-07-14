@@ -1,6 +1,7 @@
 -module(tsoder_bot_tests).
 -include_lib("eunit/include/eunit.hrl").
 
+%% TODO: decompose and rename the join unit test of tsoder_bot
 join_test_() ->
     {setup,
      fun() -> tsoder_bot:start_link() end,
@@ -26,5 +27,8 @@ join_test_() ->
                           receive
                               Msg -> ?assertMatch({message, "Hello Mark!"}, Msg)
                           end
-                      end)}]
+                      end)},
+              {timeout, 1,
+               ?_test(?assertMatch(unsupported,
+                                   gen_server:call(tsoder_bot, {message, "!hi"})))}]
      end}.
