@@ -27,7 +27,7 @@ loop(Sock) ->
                     error_logger:info_msg("Received a PING command from ~s PONGing back~n", [Host]),
                     ssl:send(Sock, "PONG " ++ Host ++ "\n");
                 {ok, {privmsg, Msg}} ->
-                    gen_fsm:send_event(tsoder_bot, {message, Msg});
+                    gen_server:cast(tsoder_bot, {message, Msg});
                 _ ->
                     error_logger:info_msg(Data)
             end,
@@ -53,7 +53,7 @@ transport_entry() ->
                              [binary, {packet, 0}]),
 
     authorize(Sock, "tsoding", Password),
-    gen_fsm:send_event(tsoder_bot, {join, self()}),
+    gen_server:cast(tsoder_bot, {join, self()}),
     ok = loop(Sock),
     quit(Sock),
 
