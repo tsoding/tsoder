@@ -19,16 +19,13 @@ terminate(Reason, State) ->
 handle_call(_, _, State) ->
     {reply, unsupported, State}.
 
-handle_cast({message, Message}, Channel) ->
+handle_cast({message, User, Message}, Channel) ->
     error_logger:info_report([{message, Message}]),
 
     option:foreach(
-      fun ({_, []}) ->
-              error_logger:info_report({command, hi}),
-              Channel ! {message, "Hello there!"};
-          ({_, Name}) ->
-              error_logger:info_report({command, hi, Name}),
-              Channel ! {message, "Hello " ++ Name ++ "!"}
+      fun (_) ->
+              error_logger:info_report({command, hi, User}),
+              Channel ! {message, "Hello " ++ User ++ "!"}
       end,
       option:filter(
         fun ({Cmd, _}) -> Cmd == "hi" end,

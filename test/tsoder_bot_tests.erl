@@ -16,16 +16,9 @@ join_test_() ->
                       end)},
               {timeout, 1,
                ?_test(begin
-                          gen_server:cast(tsoder_bot, {message, "!hi"}),
+                          gen_server:cast(tsoder_bot, {message, "khooy", "!hi"}),
                           receive
-                              Msg -> ?assertMatch({message, "Hello there!"}, Msg)
-                          end
-                      end)},
-              {timeout, 1,
-               ?_test(begin
-                          gen_server:cast(tsoder_bot, {message, "!hi Mark"}),
-                          receive
-                              Msg -> ?assertMatch({message, "Hello Mark!"}, Msg)
+                              Msg -> ?assertMatch({message, "Hello khooy!"}, Msg)
                           end
                       end)},
               {timeout, 1,
