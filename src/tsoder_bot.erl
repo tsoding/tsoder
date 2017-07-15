@@ -12,8 +12,8 @@ start_link() ->
 init([]) ->
     {ok,
      {nothing,
-      #{ "hi" =>   { fun hi_command/3, "Says hi to you" },
-         "help" => { fun help_command/3, "Prints this help text" } }}}.
+      #{ "hi" =>   { fun hi_command/3, "!hi -- says hi to you" },
+         "help" => { fun help_command/3, "!help [command] -- prints the list of supported commands" } }}}.
 
 terminate(Reason, State) ->
     error_logger:info_report([{reason, Reason},
@@ -26,11 +26,28 @@ hi_command({MaybeChannel, _}, User, _) ->
       end,
       MaybeChannel).
 
-help_command({MaybeChannel, CommandTable}, User, _) ->
+help_command({MaybeChannel, CommandTable}, User, "") ->
    option:foreach(
      fun (Channel) ->
-             Channel ! {message, "@" ++ User ++ ", help command is not ready. Please try again later"}
+             Channel ! {message,
+                        "@" ++ User ++ ", supported commands: " ++ string:join(maps:keys(CommandTable), ", ")
+                       }
      end,
+     MaybeChannel);
+help_command({MaybeChannel, CommandTable}, User, Command) ->
+    option:foreach(
+      fun (Channel) ->
+              case CommandTable of
+                  #{ Command := {_, Description} } ->
+                      Channel ! {message,
+                                 "@" ++ User ++ ", " ++ Description
+                                };
+                  _ ->
+                      Channel ! {message,
+                                 "@" ++ User ++ ", never heard of " ++ Command
+                                }
+              end
+      end,
      MaybeChannel).
 
 handle_call(_, _, State) ->
@@ -43,7 +60,7 @@ handle_cast({message, User, Message}, {MaybeChannel, CommandTable}) ->
       fun ({Command, Arguments}) ->
               case CommandTable of
                   #{ Command := { Action, _ } } ->
-                      Action({MaybeChannel, Command},
+                      Action({MaybeChannel, CommandTable},
                              User,
                              Arguments);
                   _ ->
