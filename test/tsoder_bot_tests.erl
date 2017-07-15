@@ -16,16 +16,20 @@ join_test_() ->
                       end)},
               {timeout, 1,
                ?_test(begin
-                          gen_server:cast(tsoder_bot, {message, "!hi"}),
+                          gen_server:cast(tsoder_bot, {message, "khooy", "!hi"}),
                           receive
-                              Msg -> ?assertMatch({message, "Hello there!"}, Msg)
+                              Msg -> ?assertMatch({message, "Hello khooy!"}, Msg)
                           end
                       end)},
               {timeout, 1,
                ?_test(begin
-                          gen_server:cast(tsoder_bot, {message, "!hi Mark"}),
+                          gen_server:cast(tsoder_bot, unknown_event),
                           receive
-                              Msg -> ?assertMatch({message, "Hello Mark!"}, Msg)
+                              _ ->
+                                  erlang:error("Process sent something on incorrect event")
+                          after
+                              500 ->
+                                  ?assert(true)
                           end
                       end)},
               {timeout, 1,

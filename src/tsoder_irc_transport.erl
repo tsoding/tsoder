@@ -22,15 +22,15 @@ quit(Sock) ->
 loop(Sock) ->
     receive
         {ssl, Sock, Data} ->
-            case irc_command:of_line(Data) of
-                {ok, {ping, Host}} ->
-                    error_logger:info_msg("Received a PING command from ~s PONGing back~n", [Host]),
-                    ssl:send(Sock, "PONG " ++ Host ++ "\n");
-                {ok, {privmsg, Msg}} ->
-                    gen_server:cast(tsoder_bot, {message, Msg});
-                _ ->
-                    error_logger:info_msg(Data)
-            end,
+            option:foreach(
+              fun ({ping, Host}) ->
+                      error_logger:info_msg("Received a PING command from ~s PONGing back~n", [Host]),
+                      ssl:send(Sock, "PONG " ++ Host ++ "\n");
+                  ({privmsg, User, Msg}) ->
+                      gen_server:cast(tsoder_bot, {message, User, Msg})
+              end,
+              irc_command:of_line(Data)),
+            error_logger:info_msg(Data),
             loop(Sock);
         {message, Message} ->
             send_message(Sock, Message),
