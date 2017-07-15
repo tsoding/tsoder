@@ -19,8 +19,8 @@ ping_command_of_line(Line) ->
 privmsg_command_of_line(Line) ->
     regexp_matched_command(
       Line,
-      ":.+ PRIVMSG #.+ :(.*)\r\n",
-      fun([_, Msg]) -> {privmsg, Msg} end).
+      ":.+!(.+)@.+ *PRIVMSG #.+ :(.*)\r\n",
+      fun([_, User, Msg]) -> {privmsg, User, Msg} end).
 
 of_line(Line) ->
     Commands = [fun ping_command_of_line/1,
