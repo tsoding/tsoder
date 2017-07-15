@@ -36,6 +36,6 @@ handle_cast({join, Channel}, _) ->
     error_logger:info_report([{join, Channel}]),
     Channel ! {message, "Hello from Tsoder again!"},
     {noreply, Channel};
-handle_cast(Event, Data) ->
+handle_cast(Event, Channel) ->
     error_logger:info_report([{unknown_event, Event}]),
-    {noreply, Data}.
+    {noreply, Channel}.
