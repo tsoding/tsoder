@@ -14,7 +14,12 @@
 %% API
 %%====================================================================
 
+
 start(_StartType, _StartArgs) ->
+    LogFilePath =
+        logging:file_path_from_timestamp(erlang:timestamp()),
+    filelib:ensure_dir(LogFilePath),
+    error_logger:logfile({open, LogFilePath}),
     tsoder_sup:start_link().
 
 %%--------------------------------------------------------------------
