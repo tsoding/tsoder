@@ -14,14 +14,12 @@
 %% API
 %%====================================================================
 
-log_file_name(Suffix) ->
-    string:join(["log_", Suffix, ".txt"], "").
 
 start(_StartType, _StartArgs) ->
     LogFilePath =
         filename:join(
           "./logs",
-          log_file_name(
+          logging:file_name_from_suffix(
             logging:utc_timestamp_as_string(
               calendar:now_to_universal_time(
                 erlang:timestamp())))),
