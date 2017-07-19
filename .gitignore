@@ -62,3 +62,5 @@ rel/example_project
 _build/
 
 # End of https://www.gitignore.io/api/emacs,erlang
+
+logs/
