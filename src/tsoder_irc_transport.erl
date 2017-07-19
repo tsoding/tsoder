@@ -52,7 +52,7 @@ transport_entry() ->
                              443,
                              [binary, {packet, 0}]),
 
-    authorize(Sock, "tsoding", Password),
+    authorize(Sock, "TsoderBot", Password),
     gen_server:cast(tsoder_bot, {join, self()}),
     ok = loop(Sock),
     quit(Sock),
