@@ -1,6 +1,7 @@
 -module(logging).
 -export([utc_timestamp_as_string/1,
-         file_name_from_suffix/1]).
+         file_name_from_suffix/1,
+         file_path_from_timestamp/1]).
 
 utc_timestamp_as_string({{Year, Month, Day},
                          {Hours, Minutes, Seconds}}) ->
@@ -15,3 +16,11 @@ utc_timestamp_as_string({{Year, Month, Day},
 
 file_name_from_suffix(Suffix) ->
     string:join(["log_", Suffix, ".txt"], "").
+
+file_path_from_timestamp(Timestamp) ->
+    filename:join(
+      "./logs",
+      file_name_from_suffix(
+        utc_timestamp_as_string(
+          calendar:now_to_universal_time(
+            Timestamp)))).

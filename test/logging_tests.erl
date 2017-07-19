@@ -10,3 +10,7 @@ utc_timestamp_as_string_test() ->
 file_name_from_suffix_test() ->
     ?assertMatch("log_hello.txt",
                 logging:file_name_from_suffix("hello")).
+
+file_path_from_timestamp_test() ->
+    ?assertMatch("./logs/log_2017-7-19_12-31-23.txt",
+                 logging:file_path_from_timestamp({1500,467483,785624})).
