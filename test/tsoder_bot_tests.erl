@@ -37,6 +37,13 @@ join_test_() ->
                       end)},
               {timeout, 1,
                ?_test(begin
+                          gen_server:cast(tsoder_bot, {message, "khooy", "!help khooy"}),
+                          receive
+                              Msg -> ?assertMatch({message, "@khooy, never heard of khooy"}, Msg)
+                          end
+                      end)},
+              {timeout, 1,
+               ?_test(begin
                           gen_server:cast(tsoder_bot, unknown_event),
                           receive
                               _ ->
