@@ -22,7 +22,7 @@ start(_StartType, _StartArgs) ->
         filename:join(
           "./logs",
           log_file_name(
-            utc_timestamp:as_string(
+            logging:utc_timestamp_as_string(
               calendar:now_to_universal_time(
                 erlang:timestamp())))),
     filelib:ensure_dir(LogFilePath),
