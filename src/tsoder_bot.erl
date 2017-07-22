@@ -12,8 +12,9 @@ start_link() ->
 init([]) ->
     {ok,
      {nothing,
-      #{ "hi" =>   { fun hi_command/3, "!hi -- says hi to you" },
-         "help" => { fun help_command/3, "!help [command] -- prints the list of supported commands" } }}}.
+      #{ "hi"   => { fun hi_command/3, "!hi -- says hi to you" },
+         "help" => { fun help_command/3, "!help [command] -- prints the list of supported commands" },
+         "fart" => { fun fart_command/3, "!fart -- fart" } }}}.
 
 terminate(Reason, State) ->
     error_logger:info_report([{reason, Reason},
@@ -23,6 +24,15 @@ hi_command({MaybeChannel, _}, User, _) ->
     option:foreach(
       fun (Channel) ->
               Channel ! {message, "Hello @" ++ User ++ "!"}
+      end,
+      MaybeChannel).
+
+fart_command({MaybeChannel, _}, User, "") ->
+    option:foreach(
+      fun (Channel) ->
+              Channel ! {message,
+                         "@" ++ User ++ ", don't have intestines to perform the operation, sorry."
+                        }
       end,
       MaybeChannel).
 
