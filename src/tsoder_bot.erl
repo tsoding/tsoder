@@ -27,7 +27,7 @@ hi_command({MaybeChannel, _}, User, _) ->
       end,
       MaybeChannel).
 
-fart_command({MaybeChannel, _}, User, "") ->
+fart_command({MaybeChannel, _}, User, _) ->
     option:foreach(
       fun (Channel) ->
               Channel ! {message,
