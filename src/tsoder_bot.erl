@@ -113,6 +113,9 @@ string_as_user_response(User, String) ->
 fart_rating_as_string(State) ->
     "".
 
-%% TODO: implement bumped_fart_rating_of_user
 bumped_fart_rating_of_user(User, State) ->
-    State.
+    State#state {
+      fart_rating = maps:put(User,
+                             maps:get(User, State#state.fart_rating, 0) + 1,
+                             State#state.fart_rating)
+     }.
