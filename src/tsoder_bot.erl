@@ -12,6 +12,7 @@
                   "help" => { fun help_command/3, "!help [command] -- prints the list of supported commands" },
                   "fart" => { fun fart_command/3, "!fart [rating] -- fart" }
                  },
+                %% TODO: persist fart rating
                 fart_rating = #{}
                }).
 
@@ -33,18 +34,18 @@ handle_cast({message, User, Message}, State) ->
 
     {noreply,
      option:default(State,
-      option:map(
-        fun ({Command, Arguments}) ->
-                case State#state.command_table of
-                    #{ Command := { Action, _ } } ->
-                        Action(State, User, Arguments);
-                    _ ->
-                        error_logger:info_report({unsupported_command,
-                                                  {Command, Arguments}}),
-                        State
-                end
-        end,
-        user_command:of_string(Message)))
+       option:map(
+         fun ({Command, Arguments}) ->
+                 case State#state.command_table of
+                     #{ Command := { Action, _ } } ->
+                         Action(State, User, Arguments);
+                     _ ->
+                         error_logger:info_report({unsupported_command,
+                                                   {Command, Arguments}}),
+                         State
+                 end
+         end,
+         user_command:of_string(Message)))
     };
 handle_cast({join, Channel}, State) ->
     error_logger:info_report([{join, Channel}]),
@@ -64,14 +65,24 @@ hi_command(State, User, _) ->
       State#state.channel),
     State.
 
-fart_command(State, User, _) ->
+fart_command(State, User, "rating") ->
     option:foreach(
       fun (Channel) ->
-              Channel ! string_as_user_response(User,
-                                                "don't have intestines to perform the operation, sorry.")
+              Channel ! string_as_user_response(
+                          User,
+                          fart_rating_as_string(State))
       end,
       State#state.channel),
-    State.
+    State;
+fart_command(State, User, _) ->
+    option:default(State,
+      option:map(
+        fun (Channel) ->
+                Channel ! string_as_user_response(User,
+                                                  "don't have intestines to perform the operation, sorry."),
+                bumped_fart_rating_of_user(User, State)
+        end,
+        State#state.channel)).
 
 help_command(State, User, "") ->
    option:foreach(
@@ -97,3 +108,11 @@ help_command(State, User, Command) ->
 
 string_as_user_response(User, String) ->
     {message, "@" ++ User ++ ", " ++ String}.
+
+%% TODO: implement fart_rating_as_string
+fart_rating_as_string(State) ->
+    "".
+
+%% TODO: implement bumped_fart_rating_of_user
+bumped_fart_rating_of_user(User, State) ->
+    State.
