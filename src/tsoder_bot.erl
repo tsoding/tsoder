@@ -25,6 +25,35 @@ terminate(Reason, State) ->
     error_logger:info_report([{reason, Reason},
                               {state, State}]).
 
+handle_call(_, _, State) ->
+    {reply, unsupported, State}.
+
+handle_cast({message, User, Message}, State) ->
+    error_logger:info_report([{message, Message}]),
+
+    option:foreach(
+      fun ({Command, Arguments}) ->
+              case State#state.command_table of
+                  #{ Command := { Action, _ } } ->
+                      Action(State, User, Arguments);
+                  _ ->
+                      error_logger:info_report({unsupported_command,
+                                                {Command, Arguments}})
+              end
+      end,
+      user_command:of_string(Message)),
+
+    {noreply, State};
+handle_cast({join, Channel}, State) ->
+    error_logger:info_report([{join, Channel}]),
+    Channel ! {message, "Hello from Tsoder again!"},
+    {noreply, State#state{channel = {ok, Channel}}};
+handle_cast(Event, State) ->
+    error_logger:info_report([{unknown_event, Event}]),
+    {noreply, State}.
+
+%% Internal %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 hi_command(State, User, _) ->
     option:foreach(
       fun (Channel) ->
@@ -64,30 +93,3 @@ help_command(State, User, Command) ->
               end
       end,
      State#state.channel).
-
-handle_call(_, _, State) ->
-    {reply, unsupported, State}.
-
-handle_cast({message, User, Message}, State) ->
-    error_logger:info_report([{message, Message}]),
-
-    option:foreach(
-      fun ({Command, Arguments}) ->
-              case State#state.command_table of
-                  #{ Command := { Action, _ } } ->
-                      Action(State, User, Arguments);
-                  _ ->
-                      error_logger:info_report({unsupported_command,
-                                                {Command, Arguments}})
-              end
-      end,
-      user_command:of_string(Message)),
-
-    {noreply, State};
-handle_cast({join, Channel}, State) ->
-    error_logger:info_report([{join, Channel}]),
-    Channel ! {message, "Hello from Tsoder again!"},
-    {noreply, State#state{channel = {ok, Channel}}};
-handle_cast(Event, State) ->
-    error_logger:info_report([{unknown_event, Event}]),
-    {noreply, State}.
