@@ -31,19 +31,21 @@ handle_call(_, _, State) ->
 handle_cast({message, User, Message}, State) ->
     error_logger:info_report([{message, Message}]),
 
-    option:foreach(
-      fun ({Command, Arguments}) ->
-              case State#state.command_table of
-                  #{ Command := { Action, _ } } ->
-                      Action(State, User, Arguments);
-                  _ ->
-                      error_logger:info_report({unsupported_command,
-                                                {Command, Arguments}})
-              end
-      end,
-      user_command:of_string(Message)),
-
-    {noreply, State};
+    {noreply,
+     option:default(State,
+      option:map(
+        fun ({Command, Arguments}) ->
+                case State#state.command_table of
+                    #{ Command := { Action, _ } } ->
+                        Action(State, User, Arguments);
+                    _ ->
+                        error_logger:info_report({unsupported_command,
+                                                  {Command, Arguments}}),
+                        State
+                end
+        end,
+        user_command:of_string(Message)))
+    };
 handle_cast({join, Channel}, State) ->
     error_logger:info_report([{join, Channel}]),
     Channel ! {message, "Hello from Tsoder again!"},
@@ -59,7 +61,8 @@ hi_command(State, User, _) ->
       fun (Channel) ->
               Channel ! {message, "Hello @" ++ User ++ "!"}
       end,
-      State#state.channel).
+      State#state.channel),
+    State.
 
 fart_command(State, User, _) ->
     option:foreach(
@@ -67,7 +70,8 @@ fart_command(State, User, _) ->
               Channel ! string_as_user_response(User,
                                                 "don't have intestines to perform the operation, sorry.")
       end,
-      State#state.channel).
+      State#state.channel),
+    State.
 
 help_command(State, User, "") ->
    option:foreach(
@@ -76,7 +80,8 @@ help_command(State, User, "") ->
                                                "supported commands: "
                                                ++ string:join(maps:keys(State#state.command_table), ", "))
      end,
-     State#state.channel);
+     State#state.channel),
+    State;
 help_command(State, User, Command) ->
     option:foreach(
       fun (Channel) ->
@@ -87,7 +92,8 @@ help_command(State, User, Command) ->
                       Channel ! string_as_user_response(User, "never heard of " ++ Command)
               end
       end,
-     State#state.channel).
+     State#state.channel),
+    State.
 
 string_as_user_response(User, String) ->
     {message, "@" ++ User ++ ", " ++ String}.

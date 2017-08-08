@@ -3,7 +3,8 @@
          flat_map/2,
          defined/1,
          filter/2,
-         foreach/2]).
+         foreach/2,
+         default/2]).
 
 map(F, {ok, Value}) ->
     {ok, F(Value)};
@@ -32,3 +33,8 @@ foreach(F, {ok, Value}) ->
     {ok, Value};
 foreach(_, None) ->
     None.
+
+default(_, {ok, Value}) ->
+    Value;
+default(Default, _) ->
+    Default.
