@@ -64,18 +64,17 @@ hi_command(State, User, _) ->
 fart_command(State, User, _) ->
     option:foreach(
       fun (Channel) ->
-              Channel ! {message,
-                         "@" ++ User ++ ", don't have intestines to perform the operation, sorry."
-                        }
+              Channel ! string_as_user_response(User,
+                                                "don't have intestines to perform the operation, sorry.")
       end,
       State#state.channel).
 
 help_command(State, User, "") ->
    option:foreach(
      fun (Channel) ->
-             Channel ! {message,
-                        "@" ++ User ++ ", supported commands: " ++ string:join(maps:keys(State#state.command_table), ", ")
-                       }
+             Channel ! string_as_user_response(User,
+                                               "supported commands: "
+                                               ++ string:join(maps:keys(State#state.command_table), ", "))
      end,
      State#state.channel);
 help_command(State, User, Command) ->
@@ -83,13 +82,12 @@ help_command(State, User, Command) ->
       fun (Channel) ->
               case State#state.command_table of
                   #{ Command := {_, Description} } ->
-                      Channel ! {message,
-                                 "@" ++ User ++ ", " ++ Description
-                                };
+                      Channel ! string_as_user_response(User, Description);
                   _ ->
-                      Channel ! {message,
-                                 "@" ++ User ++ ", never heard of " ++ Command
-                                }
+                      Channel ! string_as_user_response(User, "never heard of " ++ Command)
               end
       end,
      State#state.channel).
+
+string_as_user_response(User, String) ->
+    {message, "@" ++ User ++ ", " ++ String}.
