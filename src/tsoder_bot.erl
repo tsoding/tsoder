@@ -12,7 +12,7 @@
                   "help" => { fun help_command/3, "!help [command] -- prints the list of supported commands" },
                   "fart" => { fun fart_command/3, "!fart [rating] -- fart" }
                  },
-                %% TODO: persist fart rating
+                %% TODO(#66): persist fart rating
                 fart_rating = #{}
                }).
 
