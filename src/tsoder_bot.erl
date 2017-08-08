@@ -111,14 +111,14 @@ string_as_user_response(User, String) ->
 
 fart_rating_as_string(State) ->
     string:join(
-      lists:map(fun ({Name, Counter}) -> Name ++ ": " ++ Counter end,
+      lists:map(fun ({Name, Counter}) -> Name ++ ": " ++ integer_to_list(Counter) end,
         lists:sublist(
           lists:reverse(
             lists:keysort(2,
               maps:to_list(
                 State#state.fart_rating))),
           1, 10)),
-      "\n").
+      ", ").
 
 bumped_fart_rating_of_user(User, State) ->
     State#state {
