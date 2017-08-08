@@ -109,9 +109,16 @@ help_command(State, User, Command) ->
 string_as_user_response(User, String) ->
     {message, "@" ++ User ++ ", " ++ String}.
 
-%% TODO: implement fart_rating_as_string
 fart_rating_as_string(State) ->
-    "".
+    string:join(
+      lists:map(fun ({Name, Counter}) -> Name ++ ": " ++ Counter end,
+        lists:sublist(
+          lists:reverse(
+            lists:keysort(2,
+              maps:to_list(
+                State#state.fart_rating))),
+          1, 10)),
+      "\n").
 
 bumped_fart_rating_of_user(User, State) ->
     State#state {
