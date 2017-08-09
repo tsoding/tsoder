@@ -7,11 +7,6 @@
          terminate/2]).
 
 -record(state, {channel = nothing,
-                command_table = #{
-                  "hi"   => { fun hi_command/3, "!hi -- says hi to you" },
-                  "help" => { fun help_command/3, "!help [command] -- prints the list of supported commands" },
-                  "fart" => { fun fart_command/3, "!fart [rating] -- fart" }
-                 },
                 %% TODO(#66): persist fart rating
                 fart_rating = #{}
                }).
@@ -36,7 +31,7 @@ handle_cast({message, User, Message}, State) ->
      option:default(State,
        option:map(
          fun ({Command, Arguments}) ->
-                 case State#state.command_table of
+                 case command_table() of
                      #{ Command := { Action, _ } } ->
                          Action(State, User, Arguments);
                      _ ->
@@ -56,6 +51,13 @@ handle_cast(Event, State) ->
     {noreply, State}.
 
 %% Internal %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+command_table() ->
+    #{
+       "hi"   => { fun hi_command/3, "!hi -- says hi to you" },
+       "help" => { fun help_command/3, "!help [command] -- prints the list of supported commands" },
+       "fart" => { fun fart_command/3, "!fart [rating] -- fart" }
+     }.
 
 hi_command(State, User, _) ->
     option:foreach(
@@ -89,14 +91,14 @@ help_command(State, User, "") ->
      fun (Channel) ->
              Channel ! string_as_user_response(User,
                                                "supported commands: "
-                                               ++ string:join(maps:keys(State#state.command_table), ", "))
+                                               ++ string:join(maps:keys(command_table()), ", "))
      end,
      State#state.channel),
     State;
 help_command(State, User, Command) ->
     option:foreach(
       fun (Channel) ->
-              case State#state.command_table of
+              case command_table() of
                   #{ Command := {_, Description} } ->
                       Channel ! string_as_user_response(User, Description);
                   _ ->
