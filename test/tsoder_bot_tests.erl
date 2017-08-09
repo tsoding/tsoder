@@ -60,7 +60,7 @@ join_test_() ->
                ?_test(begin
                           gen_server:cast(tsoder_bot, {message, "khooy", "!help help"}),
                           receive
-                              Msg -> ?assertMatch({message, "@khooy, !help [command] -- prints the list of supported commands"}, Msg)
+                              Msg -> ?assertMatch({message, "@khooy, !help [command] -- prints the list of supported commands. Source code: https://github.com/tsoding/tsoder"}, Msg)
                           end
                       end)},
               {timeout, 1,

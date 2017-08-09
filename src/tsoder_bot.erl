@@ -55,7 +55,7 @@ handle_cast(Event, State) ->
 command_table() ->
     #{
        "hi"   => { fun hi_command/3, "!hi -- says hi to you" },
-       "help" => { fun help_command/3, "!help [command] -- prints the list of supported commands" },
+       "help" => { fun help_command/3, "!help [command] -- prints the list of supported commands. Source code: https://github.com/tsoding/tsoder" },
        "fart" => { fun fart_command/3, "!fart [rating] -- fart" }
      }.
 
