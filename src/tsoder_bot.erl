@@ -55,7 +55,7 @@ handle_cast(Event, State) ->
 command_table() ->
     #{
        "hi"   => { fun hi_command/3, "!hi -- says hi to you" },
-       "help" => { fun help_command/3, "!help [command] -- prints the list of supported commands" },
+       "help" => { fun help_command/3, "!help [command] -- prints the list of supported commands." },
        "fart" => { fun fart_command/3, "!fart [rating] -- fart" }
      }.
 
@@ -91,7 +91,8 @@ help_command(State, User, "") ->
      fun (Channel) ->
              Channel ! string_as_user_response(User,
                                                "supported commands: "
-                                               ++ string:join(maps:keys(command_table()), ", "))
+                                               ++ string:join(maps:keys(command_table()), ", ")
+                                               ++ ". Source code: https://github.com/tsoding/tsoder")
      end,
      State#state.channel),
     State;
