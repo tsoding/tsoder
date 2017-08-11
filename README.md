@@ -24,3 +24,11 @@ If you use NixOS we have a `default.nix` file at the root of the project for you
 ```console
 $ rebar3 eunit
 ```
+
+<!-- TODO: Document the docker related stuff:
+
+- How to build an image
+- How to run the container
+- etc
+
+-->
