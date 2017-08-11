@@ -8,7 +8,7 @@ ENV TSODER_VERSION master
 # Download the Erlang/OTP source
 RUN mkdir /buildroot
 WORKDIR /buildroot
-ADD https://github.com/erlang/otp/archive/OTP-${OTP_VERSION}.tar.gz
+ADD https://github.com/erlang/otp/archive/OTP-${OTP_VERSION}.tar.gz .
 RUN tar zxf OTP-${OTP_VERSION}.tar.gz
 
 # Install additional packages
@@ -38,7 +38,7 @@ ENV PATH=/buildroot/erlang/${OTP_VERSION}/bin:/buildroot/rebar3/bin:$PATH
 WORKDIR /buildroot
 
 # Add Tsoder application
-ADD https://github.com/tsoding/tsoder/archive/${TSODER_VERSION}.tar.gz
+ADD https://github.com/tsoding/tsoder/archive/${TSODER_VERSION}.tar.gz .
 RUN tar zxf ${TSODER_VERSION}.tar.gz
 WORKDIR tsoder-${TSODER_VERSION}
 RUN rebar3 release -o /artifacts
