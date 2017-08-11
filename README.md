@@ -25,7 +25,7 @@ If you use NixOS we have a `default.nix` file at the root of the project for you
 $ rebar3 eunit
 ```
 
-<!-- TODO: Document the docker related stuff:
+<!-- TODO(#76): Document the docker related stuff:
 
 - How to build an image
 - How to run the container
