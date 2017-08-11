@@ -46,7 +46,7 @@ RUN rebar3 release -o /artifacts
 # Run the tsoder application
 CMD ["/artifacts/tsoder/bin/tsoder", "foreground"]
 
-# TODO: Bake ACCESS_TOKEN into the docker image
+# TODO(#75): Bake ACCESS_TOKEN into the docker image
 #
 # Right now to run the application you have to provide the
 # ACCESS_TOKEN for the docker run command like so:
