@@ -14,7 +14,7 @@ start_link(FilePath) ->
     gen_server:start_link({local, fart_rating}, ?MODULE, [FilePath], []).
 
 init([FilePath]) ->
-    {ok, #state{ file_path = FilePath,
+    {ok, #state{ file_path = {ok, FilePath},
                  fart_rating = file_as_fart_rating(FilePath) }}.
 
 terminate(Reason, State) ->
@@ -40,12 +40,17 @@ with_dets_file(FilePath, F) ->
     Result.
 
 persisted_state(State) ->
-    with_dets_file(
+    option:foreach(
       State#state.file_path,
-      fun(Ref) ->
-              dets:insert(Ref,
+      fun(FilePath) ->
+              with_dets_file(
+                State#state.file_path,
+                fun(Ref) ->
+                        dets:insert(
+                          Ref,
                           { fart_rating,
                             State#state.fart_rating })
+                end)
       end),
     State.
 
