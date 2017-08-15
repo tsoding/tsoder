@@ -7,14 +7,14 @@
          handle_cast/2,
          terminate/2]).
 
--record(state, { file_name = nothing,
+-record(state, { file_path = nothing,
                  fart_rating = #{} }).
 
 start_link(FilePath) ->
     gen_server:start_link({local, fart_rating}, ?MODULE, [FilePath], []).
 
 init([FilePath]) ->
-    {ok, #state{ file_name = FilePath,
+    {ok, #state{ file_path = FilePath,
                  fart_rating = file_as_fart_rating(FilePath) }}.
 
 terminate(Reason, State) ->
@@ -41,7 +41,7 @@ with_dets_file(FilePath, F) ->
 
 persisted_state(State) ->
     with_dets_file(
-      State#state.file_name,
+      State#state.file_path,
       fun(Ref) ->
               dets:insert(Ref,
                           { fart_rating,
