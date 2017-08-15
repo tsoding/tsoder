@@ -25,10 +25,9 @@ If you use NixOS we have a `default.nix` file at the root of the project for you
 $ rebar3 eunit
 ```
 
-<!-- TODO(#76): Document the docker related stuff:
+## Docker
 
-- How to build an image
-- How to run the container
-- etc
-
--->
+```console
+$ docker build -t tsoder .
+$ docker run -e ACCESS_TOKEN="<access-token>" --rm tsoder
+```
