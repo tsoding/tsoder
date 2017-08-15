@@ -14,7 +14,7 @@ start_link(FilePath) ->
     gen_server:start_link({local, fart_rating}, ?MODULE, [FilePath], []).
 
 init([FilePath]) ->
-    {ok, #state{ file_name = {ok, FilePath},
+    {ok, #state{ file_name = FilePath,
                  fart_rating = file_as_fart_rating(FilePath) }}.
 
 terminate(Reason, State) ->
@@ -33,9 +33,31 @@ handle_cast({fart, User}, State) ->
 
 %% Internal %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-%% TODO: implement persisted_state
+with_dets_file(FilePath, F) ->
+    {ok, Ref} = dets:open_file(FilePath, [{type, set}]),
+    Result = F(Ref),
+    dets:close(Ref),
+    Result.
+
 persisted_state(State) ->
+    with_dets_file(
+      State#state.file_name,
+      fun(Ref) ->
+              dets:insert(Ref,
+                          { fart_rating,
+                            State#state.fart_rating })
+      end),
     State.
+
+file_as_fart_rating(FilePath) ->
+    with_dets_file(
+      FilePath,
+      fun(Ref) ->
+              case dets:lookup(Ref, fart_rating) of
+                  [] -> #{};
+                  [{fart_rating, FartRating}] -> FartRating
+              end
+      end).
 
 bumped_fart_rating_of_user(User, State) ->
     State#state {
@@ -56,7 +78,3 @@ fart_rating_as_string(Rating) ->
                 Rating))),
           1, 10)),
       ", ").
-
-%% TODO: implement file_as_fart_rating
-file_as_fart_rating(FilePath) ->
-    #{}.

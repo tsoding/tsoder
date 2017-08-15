@@ -31,7 +31,7 @@ init([]) ->
     {ok, { {one_for_all, 1, 1}, [#{id => fart_rating,
                                    start => {fart_rating,
                                              start_link,
-                                             ["fart_rating.dat"]},
+                                             ["./fart_rating.dat"]},
                                    restart => permanent,
                                    shutdown => brutal_kill,
                                    type => worker},
