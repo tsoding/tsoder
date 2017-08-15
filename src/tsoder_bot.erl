@@ -6,15 +6,14 @@
          handle_cast/2,
          terminate/2]).
 
--record(state, {channel = nothing,
-                fart_rating = #{}
-               }).
+-record(state, { channel = nothing,
+                 fart_rating = nothing }).
 
 start_link(FartRating) ->
-    gen_server:start_link({local, tsoder_bot}, ?MODULE, [], [{debug, [trace]}]).
+    gen_server:start_link({local, tsoder_bot}, ?MODULE, [FartRating], [{debug, [trace]}]).
 
-init([]) ->
-    {ok, #state{}}.
+init([FartRating]) ->
+    {ok, #state{ fart_rating = FartRating }}.
 
 terminate(Reason, State) ->
     error_logger:info_report([{reason, Reason},
@@ -71,19 +70,19 @@ fart_command(State, User, "rating") ->
       fun (Channel) ->
               Channel ! string_as_user_response(
                           User,
-                          fart_rating_as_string(State))
+                          gen_server:call(State#state.fart_rating, rating))
       end,
       State#state.channel),
     State;
 fart_command(State, User, _) ->
-    option:default(State,
-      option:map(
-        fun (Channel) ->
-                Channel ! string_as_user_response(User,
-                                                  "don't have intestines to perform the operation, sorry."),
-                bumped_fart_rating_of_user(User, State)
-        end,
-        State#state.channel)).
+    option:foreach(
+      fun (Channel) ->
+              Channel ! string_as_user_response(User,
+                                                "don't have intestines to perform the operation, sorry."),
+              gen_server:cast(State#state.fart_rating, {fart, User})
+      end,
+      State#state.channel),
+    State.
 
 help_command(State, User, "") ->
    option:foreach(
@@ -110,21 +109,3 @@ help_command(State, User, Command) ->
 
 string_as_user_response(User, String) ->
     {message, "@" ++ User ++ ", " ++ String}.
-
-fart_rating_as_string(State) ->
-    string:join(
-      lists:map(fun ({Name, Counter}) -> Name ++ ": " ++ integer_to_list(Counter) end,
-        lists:sublist(
-          lists:reverse(
-            lists:keysort(2,
-              maps:to_list(
-                State#state.fart_rating))),
-          1, 10)),
-      ", ").
-
-bumped_fart_rating_of_user(User, State) ->
-    State#state {
-      fart_rating = maps:put(User,
-                             maps:get(User, State#state.fart_rating, 0) + 1,
-                             State#state.fart_rating)
-     }.
