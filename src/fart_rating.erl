@@ -1,7 +1,8 @@
 -module(fart_rating).
 -behaviour(gen_server).
 
--export([start_link/1,
+-export([start_link/0,
+         start_link/1,
          init/1,
          handle_call/3,
          handle_cast/2,
@@ -13,9 +14,16 @@
 start_link(FilePath) ->
     gen_server:start_link({local, fart_rating}, ?MODULE, [FilePath], []).
 
+start_link() ->
+    gen_server:start_link({local, fart_rating}, ?MODULE, [], []).
+
+
 init([FilePath]) ->
     {ok, #state{ file_path = {ok, FilePath},
-                 fart_rating = file_as_fart_rating(FilePath) }}.
+                 fart_rating = file_as_fart_rating(FilePath) }};
+init([]) ->
+    {ok, #state{}}.
+
 
 terminate(Reason, State) ->
     error_logger:info_report([{reason, Reason},
@@ -41,17 +49,17 @@ with_dets_file(FilePath, F) ->
 
 persisted_state(State) ->
     option:foreach(
-      State#state.file_path,
       fun(FilePath) ->
               with_dets_file(
-                State#state.file_path,
+                FilePath,
                 fun(Ref) ->
                         dets:insert(
                           Ref,
                           { fart_rating,
                             State#state.fart_rating })
                 end)
-      end),
+      end,
+      State#state.file_path),
     State.
 
 file_as_fart_rating(FilePath) ->
