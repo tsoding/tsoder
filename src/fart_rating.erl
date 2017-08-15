@@ -22,7 +22,9 @@ terminate(Reason, State) ->
                               {state, State}]).
 
 handle_call(rating, _, State) ->
-    {reply, fart_rating_as_string(State#state.fart_rating), State}.
+    { reply,
+      fart_rating_as_string(State#state.fart_rating),
+      State }.
 
 handle_cast({fart, User}, State) ->
     { noreply,
