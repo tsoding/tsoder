@@ -39,9 +39,18 @@ persisted_state(State) ->
 bumped_fart_rating_of_user(User, State) ->
     State.
 
-%% TODO: implement fart_rating_as_string
 fart_rating_as_string(Rating) ->
-    "Fart Rating".
+    string:join(
+      lists:map(fun ({Name, Counter}) ->
+                        Name ++ ": " ++ integer_to_list(Counter)
+                end,
+        lists:sublist(
+          lists:reverse(
+            lists:keysort(2,
+              maps:to_list(
+                Rating))),
+          1, 10)),
+      ", ").
 
 %% TODO: implement file_as_fart_rating
 file_as_fart_rating(FilePath) ->
