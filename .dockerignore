@@ -2,4 +2,4 @@ Dockerfile
 _build/
 default.nix
 logs/
-fart-rating.dat
+fart_rating.dat
