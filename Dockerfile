@@ -38,9 +38,9 @@ ENV PATH=/buildroot/erlang/${OTP_VERSION}/bin:/buildroot/rebar3/bin:$PATH
 WORKDIR /buildroot
 
 # Add Tsoder application
-ADD https://github.com/tsoding/tsoder/archive/${TSODER_VERSION}.tar.gz .
-RUN tar zxf ${TSODER_VERSION}.tar.gz
-WORKDIR tsoder-${TSODER_VERSION}
+RUN mkdir tsoder/
+COPY . tsoder/
+WORKDIR tsoder/
 RUN rebar3 release -o /artifacts
 
 # Run the tsoder application
