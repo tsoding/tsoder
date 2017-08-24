@@ -42,6 +42,10 @@ COPY . tsoder/
 WORKDIR tsoder/
 RUN rebar3 release -o /artifacts
 
+# Create a volume
+RUN mkdir /artifacts/tsoder/bin/state
+VOLUME ["/artifacts/tsoder/bin/state"]
+
 # Run the tsoder application
 CMD ["/artifacts/tsoder/bin/tsoder", "foreground"]
 
