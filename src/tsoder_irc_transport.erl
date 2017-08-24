@@ -8,18 +8,18 @@ start_transport() ->
 %% Internal functions
 %%====================================================================
 
-authorize(Sock, Login, Password) ->
+authorize(Sock, Login, Password, Channel) ->
     ok = ssl:send(Sock, "PASS " ++ Password ++ "\n"),
     ok = ssl:send(Sock, "NICK " ++ Login ++ "\n"),
-    ok = ssl:send(Sock, "JOIN #tsoding\n").
+    ok = ssl:send(Sock, "JOIN #" ++ Channel ++"\n").
 
-send_message(Sock, Message) ->
-    ok = ssl:send(Sock, "PRIVMSG #tsoding :" ++ Message ++ "\n").
+send_message(Sock, Message, Channel) ->
+    ok = ssl:send(Sock, "PRIVMSG #" ++ Channel ++ " :" ++ Message ++ "\n").
 
 quit(Sock) ->
     ok = ssl:send(Sock, "QUIT\n").
 
-loop(Sock) ->
+loop(Sock, Channel) ->
     receive
         {ssl, Sock, Data} ->
             option:foreach(
@@ -31,10 +31,10 @@ loop(Sock) ->
               end,
               irc_command:of_line(Data)),
             error_logger:info_msg(Data),
-            loop(Sock);
+            loop(Sock, Channel);
         {message, Message} ->
-            send_message(Sock, Message),
-            loop(Sock);
+            send_message(Sock, Message, Channel),
+            loop(Sock, Channel);
         {ssl_error, Sock, Reason} ->
             {error, Reason};
         {ssl_closed, Sock} ->
@@ -47,14 +47,15 @@ loop(Sock) ->
 
 transport_entry() ->
     %% TODO(#15): Implement some application configuration that stores the OAuth token for Twitch authorization
+    Channel = os:getenv("TSODER_CHANNEL"),
     Password = os:getenv("ACCESS_TOKEN"),
     {ok, Sock} = ssl:connect("irc.chat.twitch.tv",
                              443,
                              [binary, {packet, 0}]),
 
-    authorize(Sock, "TsoderBot", Password),
+    authorize(Sock, "TsoderBot", Password, Channel),
     gen_server:cast(tsoder_bot, {join, self()}),
-    ok = loop(Sock),
+    ok = loop(Sock, Channel),
     quit(Sock),
 
     ok = ssl:close(Sock).
