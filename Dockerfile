@@ -44,7 +44,7 @@ RUN rebar3 release -o /artifacts
 
 # Create a volume
 RUN mkdir -p /artifacts/tsoder/state/
-# TODO: Document how to properly backup the volume
+# TODO(#85): Document how to properly backup the volume
 VOLUME ["/artifacts/tsoder/state/"]
 
 # Run the tsoder application
