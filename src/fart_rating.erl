@@ -19,6 +19,7 @@ start_link() ->
 
 
 init([FilePath]) ->
+    filelib:ensure_dir(FilePath),
     {ok, #state{ file_path = {ok, FilePath},
                  fart_rating = file_as_fart_rating(FilePath) }};
 init([]) ->

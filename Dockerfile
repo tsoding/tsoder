@@ -3,7 +3,6 @@ FROM alpine:3.3
 MAINTAINER Alexey Kutepov <reximkut@gmail.com>
 
 ENV OTP_VERSION 18.3
-ENV TSODER_VERSION master
 
 # Download the Erlang/OTP source
 RUN mkdir /buildroot
@@ -38,27 +37,15 @@ ENV PATH=/buildroot/erlang/${OTP_VERSION}/bin:/buildroot/rebar3/bin:$PATH
 WORKDIR /buildroot
 
 # Add Tsoder application
-ADD https://github.com/tsoding/tsoder/archive/${TSODER_VERSION}.tar.gz .
-RUN tar zxf ${TSODER_VERSION}.tar.gz
-WORKDIR tsoder-${TSODER_VERSION}
+RUN mkdir tsoder/
+COPY . tsoder/
+WORKDIR tsoder/
 RUN rebar3 release -o /artifacts
+
+# Create a volume
+RUN mkdir -p /artifacts/tsoder/state/
+# TODO(#85): Document how to properly backup the volume
+VOLUME ["/artifacts/tsoder/state/"]
 
 # Run the tsoder application
 CMD ["/artifacts/tsoder/bin/tsoder", "foreground"]
-
-# TODO(#75): Bake ACCESS_TOKEN into the docker image
-#
-# Right now to run the application you have to provide the
-# ACCESS_TOKEN for the docker run command like so:
-#
-# ```console
-# $ docker run -e ACCESS_TOKEN="<access-token>" --rm tsoder
-# ```
-#
-# We need to be able provide the ACCESS_TOKEN at the docker build time
-# like so:
-#
-# ```console
-# $ docker build --build-arg access_token="<access-token>" -t tsoder .
-# $ docker run --rm tsoder
-# ```

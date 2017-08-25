@@ -29,7 +29,7 @@ $ rebar3 eunit
 
 ```console
 $ docker build -t tsoder .
-$ docker create -e ACCESS_TOKEN="<access-token>" --name morning-tsoding tsoder
+$ docker create -e ACCESS_TOKEN="<access-token>" -e TSODER_CHANNEL="<channel-name>" --name morning-tsoding tsoder
 $ docker start morning-tsoding
 $ docker stop morning-tsoding
 ```
