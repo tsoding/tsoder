@@ -48,20 +48,3 @@ VOLUME ["/artifacts/tsoder/state/"]
 
 # Run the tsoder application
 CMD ["/artifacts/tsoder/bin/tsoder", "foreground"]
-
-# TODO(#75): Bake ACCESS_TOKEN into the docker image
-#
-# Right now to run the application you have to provide the
-# ACCESS_TOKEN for the docker run command like so:
-#
-# ```console
-# $ docker run -e ACCESS_TOKEN="<access-token>" --rm tsoder
-# ```
-#
-# We need to be able provide the ACCESS_TOKEN at the docker build time
-# like so:
-#
-# ```console
-# $ docker build --build-arg access_token="<access-token>" -t tsoder .
-# $ docker run --rm tsoder
-# ```
