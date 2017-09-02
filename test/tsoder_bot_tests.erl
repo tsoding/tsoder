@@ -4,8 +4,8 @@
 %% TODO(#50): decompose and rename the join unit test of tsoder_bot
 join_test_() ->
     {setup,
-     fun() -> tsoder_bot:start_link(fun fart_rating_callback:empty/0,
-                                    fart_rating_callback)
+     fun() -> tsoder_bot:start_link(fun fart_rating:empty/0,
+                                    fart_rating)
      end,
      fun(_) -> gen_server:stop(tsoder_bot) end,
      fun(_) ->

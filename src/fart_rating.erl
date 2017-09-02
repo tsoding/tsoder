@@ -1,4 +1,4 @@
--module(fart_rating_callback).
+-module(fart_rating).
 -export([empty/0,
          from_file/1,
          bump_counter/2,
