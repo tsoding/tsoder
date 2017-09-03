@@ -44,8 +44,10 @@ RUN rebar3 release -o /artifacts
 
 # Create a volume
 RUN mkdir -p /artifacts/tsoder/state/
+RUN mkdir -p /tmp/tsoder.mnesia/
 # TODO(#85): Document how to properly backup the volume
 VOLUME ["/artifacts/tsoder/state/"]
+VOLUME ["/tmp/tsoder.mnesia/"]
 
 # Run the tsoder application
 CMD ["/artifacts/tsoder/bin/tsoder", "foreground"]

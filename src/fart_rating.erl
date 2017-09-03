@@ -7,6 +7,8 @@
 -record(state, { file_path = nothing,
                  fart_rating = #{} }).
 
+%% TODO(#90): migrate fart_rating to mnesia
+
 empty() ->
     #state {}.
 
