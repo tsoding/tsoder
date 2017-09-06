@@ -3,14 +3,19 @@
          file_name_from_suffix/1,
          file_path_from_timestamp/1]).
 
+padded_int(P, N) ->
+    string:right(integer_to_list(N), P, $0).
+
 utc_timestamp_as_string({{Year, Month, Day},
                          {Hours, Minutes, Seconds}}) ->
     string:join(
-      [string:join(lists:map(fun integer_to_list/1,
-                             [Year, Month, Day]),
+      [string:join([integer_to_list(Year),
+                    padded_int(2, Month),
+                    padded_int(2, Day)],
                    "-"),
-       string:join(lists:map(fun integer_to_list/1,
-                             [Hours, Minutes, Seconds]),
+       string:join([padded_int(2, Hours),
+                    padded_int(2, Minutes),
+                    padded_int(2, Seconds)],
                    "-")],
       "_").
 
