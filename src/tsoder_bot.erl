@@ -11,7 +11,7 @@
                  fart_rating_state }).
 
 start_link(FartRatingState, FartRatingModule) ->
-    gen_server:start_link({local, tsoder_bot}, ?MODULE, [FartRatingState, FartRatingModule], [{debug, [trace]}]).
+    gen_server:start_link({local, tsoder_bot}, ?MODULE, [FartRatingState, FartRatingModule], []).
 
 init([FartRatingState, FartRatingModule]) ->
     {ok, #state{ fart_rating_module = FartRatingModule,
