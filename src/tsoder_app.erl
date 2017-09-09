@@ -20,6 +20,7 @@ start(_StartType, _StartArgs) ->
         logging:file_path_from_timestamp(erlang:timestamp()),
     filelib:ensure_dir(LogFilePath),
     error_logger:logfile({open, LogFilePath}),
+    error_logger:tty(false),
     tsoder_sup:start_link().
 
 %%--------------------------------------------------------------------
