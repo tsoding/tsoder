@@ -69,10 +69,12 @@ ub_command(State, User, "") ->
 ub_command(State, User, Term) ->
     option:foreach(
       fun(Channel) ->
+              %% TODO: response should include the link to the defintion page
               Channel ! string_as_user_response(
                           User,
                           option:default(
                             "Could not find the term",
+                            %% TODO: Truncate the defintion to some amount of characters
                             ub_definition_of_term(Term)))
       end,
       State#state.channel),
