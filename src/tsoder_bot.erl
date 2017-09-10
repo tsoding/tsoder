@@ -44,6 +44,7 @@ handle_cast({message, User, Message}, State) ->
     };
 handle_cast({join, Channel}, State) ->
     error_logger:info_report([{join, Channel}]),
+    Channel ! {message, "Hello from Tsoder again!"},
     {noreply, State#state{channel = {ok, Channel}}};
 handle_cast(Event, State) ->
     error_logger:info_report([{unknown_event, Event}]),
