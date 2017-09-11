@@ -75,8 +75,11 @@ ub_command(State, User, Term) ->
                           User,
                           option:default(
                             "Could not find the term",
-                            %% TODO: Truncate the defintion to some amount of characters
-                            ub_definition_of_term(Term)))
+                            option:flat_map(
+                              fun ub_definition:from_http_response/1,
+                              httpc:request(
+                                "http://api.urbandictionary.com/v0/define?term="
+                                ++ http_uri:encode(Term)))))
       end,
       State#state.channel),
     State.
@@ -140,19 +143,3 @@ help_command(State, User, Command) ->
 
 string_as_user_response(User, String) ->
     {message, "@" ++ User ++ ", " ++ String}.
-
-ub_definition_of_term(Term) ->
-    option:flat_map(
-      fun ({_, _, Body}) ->
-              {UbResponse} = jiffy:decode(Body),
-              case proplists:get_value(<<"list">>, UbResponse) of
-                  [{FirstDefinition}|_] -> {ok, binary:bin_to_list(
-                                                  proplists:get_value(
-                                                    <<"definition">>,
-                                                    FirstDefinition))};
-                  _ -> {not_found}
-              end
-      end,
-      httpc:request(
-        "http://api.urbandictionary.com/v0/define?term="
-        ++ http_uri:encode(Term))).
