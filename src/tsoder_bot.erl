@@ -70,7 +70,7 @@ ub_command(State, User, "") ->
 ub_command(State, User, Term) ->
     option:foreach(
       fun(Channel) ->
-              %% TODO: response should include the link to the defintion page
+              %% TODO(#98): response should include the link to the defintion page
               Channel ! string_as_user_response(
                           User,
                           option:default(
