@@ -56,8 +56,35 @@ command_table() ->
     #{
        "hi"   => { fun hi_command/3, "!hi -- says hi to you" },
        "help" => { fun help_command/3, "!help [command] -- prints the list of supported commands." },
-       "fart" => { fun fart_command/3, "!fart [rating] -- fart" }
+       "fart" => { fun fart_command/3, "!fart [rating] -- fart" },
+       "ub"   => { fun ub_command/3, "!ub [term] -- Lookup the term in Urban Dictionary" }
      }.
+
+ub_command(State, User, "") ->
+    option:foreach(
+      fun (Channel) ->
+              Channel ! string_as_user_response(User, "Cannot lookup an empty term")
+      end,
+      State#state.channel),
+    State;
+ub_command(State, User, Term) ->
+    option:foreach(
+      fun(Channel) ->
+              %% TODO(#98): response should include the link to the defintion page
+              Channel ! string_as_user_response(
+                          User,
+                          option:default(
+                            "Could not find the term",
+                            %% TODO(#99): Truncate the defintion to some limited amount of characters
+                            option:flat_map(
+                              fun ub_definition:from_http_response/1,
+                              httpc:request(
+                                "http://api.urbandictionary.com/v0/define?term="
+                                ++ http_uri:encode(Term)))))
+      end,
+      State#state.channel),
+    State.
+
 
 hi_command(State, User, _) ->
     option:foreach(

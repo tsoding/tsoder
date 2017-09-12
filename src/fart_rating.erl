@@ -13,6 +13,7 @@ empty() ->
     #state {}.
 
 from_file(FilePath) ->
+    filelib:ensure_dir(FilePath),
     #state{ file_path = {ok, FilePath},
             fart_rating = file_as_fart_rating(FilePath) }.
 
