@@ -75,6 +75,7 @@ ub_command(State, User, Term) ->
                           User,
                           option:default(
                             "Could not find the term",
+                            %% TODO: Truncate the defintion to some limited amount of characters
                             option:flat_map(
                               fun ub_definition:from_http_response/1,
                               httpc:request(
