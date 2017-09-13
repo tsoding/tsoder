@@ -75,12 +75,15 @@ ub_command(State, User, Term) ->
                           User,
                           option:default(
                             "Could not find the term",
-                            %% TODO(#99): Truncate the defintion to some limited amount of characters
-                            option:flat_map(
-                              fun ub_definition:from_http_response/1,
-                              httpc:request(
-                                "http://api.urbandictionary.com/v0/define?term="
-                                ++ http_uri:encode(Term)))))
+                            option:map(
+                              fun (Definition) ->
+                                      string:substr(Definition, 1, 200)
+                              end,
+                              option:flat_map(
+                                fun ub_definition:from_http_response/1,
+                                httpc:request(
+                                  "http://api.urbandictionary.com/v0/define?term="
+                                  ++ http_uri:encode(Term))))))
       end,
       State#state.channel),
     State.

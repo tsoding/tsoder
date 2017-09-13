@@ -8,13 +8,18 @@ start_transport() ->
 %% Internal functions
 %%====================================================================
 
+remove_newlines(Text) ->
+    re:replace(Text, "[\n\r]+", " ", [{return, list}, global]).
+
 authorize(Sock, Login, Password, Channel) ->
     ok = ssl:send(Sock, "PASS " ++ Password ++ "\n"),
     ok = ssl:send(Sock, "NICK " ++ Login ++ "\n"),
     ok = ssl:send(Sock, "JOIN #" ++ Channel ++"\n").
 
 send_message(Sock, Message, Channel) ->
-    ok = ssl:send(Sock, "PRIVMSG #" ++ Channel ++ " :" ++ Message ++ "\n").
+    IrcMessage = "PRIVMSG #" ++ Channel ++ " :" ++ remove_newlines(Message) ++ "\n",
+    error_logger:info_msg(IrcMessage),
+    ok = ssl:send(Sock, IrcMessage).
 
 quit(Sock) ->
     ok = ssl:send(Sock, "QUIT\n").
