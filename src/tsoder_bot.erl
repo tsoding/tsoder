@@ -56,8 +56,8 @@ command_table() ->
     #{
        "hi"   => { fun hi_command/3, "!hi -- says hi to you" },
        "help" => { fun help_command/3, "!help [command] -- prints the list of supported commands." },
-       "fart" => { fun fart_command/3, "!fart [rating] -- fart" },
-       "ub"   => { fun ub_command/3, "!ub [term] -- Lookup the term in Urban Dictionary" }
+       "fart" => { fun fart_command/3, "!fart [rating] -- fart" }%% ,
+       %% "ub"   => { fun ub_command/3, "!ub [term] -- Lookup the term in Urban Dictionary" }
      }.
 
 ub_command(State, User, "") ->
