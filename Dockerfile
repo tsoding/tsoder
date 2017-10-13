@@ -40,13 +40,12 @@ WORKDIR /buildroot
 RUN mkdir tsoder/
 COPY . tsoder/
 WORKDIR tsoder/
+RUN ./scripts/create_db.erl "/tmp/tsoder.mnesia/"
 RUN rebar3 release -o /artifacts
 
-# Create a volume
-RUN mkdir -p /artifacts/tsoder/state/
-RUN mkdir -p /tmp/tsoder.mnesia/
 # TODO(#85): Document how to properly backup the volume
-VOLUME ["/artifacts/tsoder/state/"]
+# TODO: Extract log/ folder to volume
+# Create a volume
 VOLUME ["/tmp/tsoder.mnesia/"]
 
 # Run the tsoder application

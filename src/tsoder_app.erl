@@ -17,6 +17,7 @@
 
 
 start(_StartType, _StartArgs) ->
+    error_logger:info_report({args, _StartArgs, _StartType}),
     start_logging(),
     tsoder_sup:start_link().
 
