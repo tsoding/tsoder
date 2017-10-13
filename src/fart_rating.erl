@@ -5,7 +5,7 @@
 -include("fart_rating.hrl").
 
 bump_counter(User) ->
-    mnesia:transaction(
+    mnesia:sync_transaction(
       fun() ->
               case mnesia:read(fart_rating, User, write) of
                   [] -> mnesia:write(
@@ -23,7 +23,7 @@ bump_counter(User) ->
 
 as_string() ->
     {atomic, String} =
-        mnesia:transaction(
+        mnesia:sync_transaction(
           fun() ->
                   string:join(
                     lists:map(
