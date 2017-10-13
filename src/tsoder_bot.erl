@@ -14,7 +14,6 @@ start_link() ->
     gen_server:start_link({local, tsoder_bot}, ?MODULE, [], []).
 
 init([]) ->
-    ok = mnesia:wait_for_tables([fart_rating], 5000),
     {ok, #state{}}.
 
 terminate(Reason, State) ->

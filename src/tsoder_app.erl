@@ -17,8 +17,8 @@
 
 
 start(_StartType, _StartArgs) ->
-    error_logger:info_report({args, _StartArgs, _StartType}),
     start_logging(),
+    ok = mnesia:wait_for_tables([fart_rating], 5000),
     tsoder_sup:start_link().
 
 %%--------------------------------------------------------------------
