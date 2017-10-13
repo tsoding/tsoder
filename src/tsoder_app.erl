@@ -9,6 +9,7 @@
 
 %% Application callbacks
 -export([start/2, stop/1]).
+-include("fart_rating.hrl").
 
 %%====================================================================
 %% API
@@ -16,11 +17,8 @@
 
 
 start(_StartType, _StartArgs) ->
-    LogFilePath =
-        logging:file_path_from_timestamp(erlang:timestamp()),
-    filelib:ensure_dir(LogFilePath),
-    error_logger:logfile({open, LogFilePath}),
-    error_logger:tty(false),
+    start_logging(),
+    ok = mnesia:wait_for_tables([fart_rating], 5000),
     tsoder_sup:start_link().
 
 %%--------------------------------------------------------------------
@@ -30,3 +28,9 @@ stop(_State) ->
 %%====================================================================
 %% Internal functions
 %%====================================================================
+
+start_logging() ->
+    LogFilePath =
+        logging:file_path_from_timestamp(erlang:timestamp()),
+    filelib:ensure_dir(LogFilePath),
+    error_logger:logfile({open, LogFilePath}).

@@ -7,14 +7,11 @@ Bot for Tsoding streams
 
 ![tsoder](https://raw.githubusercontent.com/tsoding/tsoder-brand/master/images/logo.png)
 
-## Build
+## Quick Start
 
 ```console
-$ rebar3 compile
-$ rebar3 shell
-> application:start(tsoder).
-...
-> application:stop(tsoder).
+$ ./scripts/create_db.erl /tmp/tsoder.mnesia/ # initializing database (see config/sys.config)
+$ ACCESS_TOKEN="<twitch-access-token>" TSODER_CHANNEL="<twitch-channal>" rebar3 shell --name tsoder@node
 ```
 
 If you use NixOS we have a `default.nix` file at the root of the project for you to make your life easier.

@@ -4,8 +4,7 @@
 %% TODO(#50): decompose and rename the join unit test of tsoder_bot
 join_test_() ->
     {setup,
-     fun() -> tsoder_bot:start_link(fun fart_rating:empty/0,
-                                    fart_rating)
+     fun() -> tsoder_bot:start_link()
      end,
      fun(_) -> gen_server:stop(tsoder_bot) end,
      fun(_) ->
@@ -14,34 +13,6 @@ join_test_() ->
                           gen_server:cast(tsoder_bot, {join, self()}),
                           receive
                               Msg -> ?assertMatch({message, "Hello from Tsoder again!"}, Msg)
-                          end
-                      end)},
-              {timeout, 1,
-               ?_test(begin
-                          gen_server:cast(tsoder_bot, {message, "khooy", "!fart"}),
-                          receive
-                              Msg -> ?assertMatch({message, "@khooy, don't have intestines to perform the operation, sorry."}, Msg)
-                          end
-                      end)},
-              {timeout, 1,
-               ?_test(begin
-                          gen_server:cast(tsoder_bot, {message, "khooy", "!fart harder"}),
-                          receive
-                              Msg -> ?assertMatch({message, "@khooy, don't have intestines to perform the operation, sorry."}, Msg)
-                          end
-                      end)},
-              {timeout, 1,
-               ?_test(begin
-                          gen_server:cast(tsoder_bot, {message, "hello", "!fart faster"}),
-                          receive
-                              Msg -> ?assertMatch({message, "@hello, don't have intestines to perform the operation, sorry."}, Msg)
-                          end
-                      end)},
-              {timeout, 1,
-               ?_test(begin
-                          gen_server:cast(tsoder_bot, {message, "khooy", "!fart rating"}),
-                          receive
-                              Msg -> ?assertMatch({message, "@khooy, khooy: 2, hello: 1"}, Msg)
                           end
                       end)},
               {timeout, 1,
