@@ -1,21 +1,18 @@
 -module(tsoder_bot).
 -behaviour(gen_server).
--export([start_link/2,
+-export([start_link/0,
          init/1,
          handle_call/3,
          handle_cast/2,
          terminate/2]).
 
--record(state, { channel = nothing,
-                 fart_rating_module,
-                 fart_rating_state }).
+-record(state, { channel = nothing }).
 
-start_link(FartRatingState, FartRatingModule) ->
-    gen_server:start_link({local, tsoder_bot}, ?MODULE, [FartRatingState, FartRatingModule], []).
+start_link() ->
+    gen_server:start_link({local, tsoder_bot}, ?MODULE, [], []).
 
-init([FartRatingState, FartRatingModule]) ->
-    {ok, #state{ fart_rating_module = FartRatingModule,
-                 fart_rating_state = FartRatingState() }}.
+init([]) ->
+    {ok, #state{}}.
 
 terminate(Reason, State) ->
     error_logger:info_report([{reason, Reason},
@@ -102,25 +99,18 @@ fart_command(State, User, "rating") ->
       fun (Channel) ->
               Channel ! string_as_user_response(
                           User,
-                          apply(State#state.fart_rating_module,
-                                as_string,
-                                [State#state.fart_rating_state]))
+                          fart_rating:as_string())
       end,
       State#state.channel),
     State;
 fart_command(State, User, _) ->
-    option:default(
-      State,
-      option:map(
-        fun (Channel) ->
-                Channel ! string_as_user_response(User,
-                                                  "don't have intestines to perform the operation, sorry."),
-                State#state { fart_rating_state =
-                                  apply(State#state.fart_rating_module,
-                                        bump_counter,
-                                        [State#state.fart_rating_state, User]) }
-        end,
-        State#state.channel)).
+    option:foreach(
+      fun (Channel) ->
+              Channel ! string_as_user_response(User,
+                                                "don't have intestines to perform the operation, sorry."),
+              fart_rating:bump_counter(User)
+      end),
+    State.
 
 help_command(State, User, "") ->
    option:foreach(

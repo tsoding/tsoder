@@ -29,10 +29,7 @@ start_link() ->
 %% Child :: {Id,StartFunc,Restart,Shutdown,Type,Modules}
 init([]) ->
     {ok, { {one_for_all, 1, 1}, [#{id => tsoder_bot,
-                                   start => {tsoder_bot,
-                                             start_link,
-                                             [fun () -> fart_rating:from_file("./state/fart_rating.dat") end,
-                                              fart_rating]},
+                                   start => {tsoder_bot, start_link, []},
                                    restart => permanent,
                                    shutdown => brutal_kill,
                                    type => worker},

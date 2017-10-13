@@ -1,72 +1,40 @@
 -module(fart_rating).
--export([empty/0,
-         from_file/1,
-         bump_counter/2,
-         as_string/1]).
+-export([bump_counter/1,
+         as_string/0]).
 
--record(state, { file_path = nothing,
-                 fart_rating = #{} }).
+-include("fart_rating.hrl").
 
-%% TODO(#90): migrate fart_rating to mnesia
-
-empty() ->
-    #state {}.
-
-from_file(FilePath) ->
-    filelib:ensure_dir(FilePath),
-    #state{ file_path = {ok, FilePath},
-            fart_rating = file_as_fart_rating(FilePath) }.
-
-bump_counter(State, User) ->
-    persisted_state(
-      State#state {
-        fart_rating = maps:put(User,
-                               maps:get(User, State#state.fart_rating, 0) + 1,
-                               State#state.fart_rating)
-       }).
-
-as_string(State) ->
-    string:join(
-      lists:map(fun ({Name, Counter}) ->
-                        Name ++ ": " ++ integer_to_list(Counter)
-                end,
-        lists:sublist(
-          lists:reverse(
-            lists:keysort(2,
-              maps:to_list(
-                State#state.fart_rating))),
-          1, 10)),
-      ", ").
-
-%% Internal %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-with_dets_file(FilePath, F) ->
-    {ok, Ref} = dets:open_file(FilePath, [{type, set}]),
-    Result = F(Ref),
-    dets:close(Ref),
-    Result.
-
-persisted_state(State) ->
-    option:foreach(
-      fun(FilePath) ->
-              with_dets_file(
-                FilePath,
-                fun(Ref) ->
-                        dets:insert(
-                          Ref,
-                          { fart_rating,
-                            State#state.fart_rating })
-                end)
-      end,
-      State#state.file_path),
-    State.
-
-file_as_fart_rating(FilePath) ->
-    with_dets_file(
-      FilePath,
-      fun(Ref) ->
-              case dets:lookup(Ref, fart_rating) of
-                  [] -> #{};
-                  [{fart_rating, FartRating}] -> FartRating
+bump_counter(User) ->
+    mnesia:transaction(
+      fun() ->
+              case mnesia:read(fart_rating, User, write) of
+                  [] -> mnesia:write(
+                          #fart_rating {
+                            name = User,
+                            rating = 1
+                           });
+                  [FartRating] ->
+                      mnesia:write(
+                        FartRating#fart_rating {
+                          rating = FartRating#fart_rating.rating + 1
+                         })
               end
       end).
+
+as_string() ->
+    string:join(
+      lists:map(
+        fun ({Name, Counter}) ->
+                Name ++ ": " + integer_to_list(Counter)
+        end,
+        lists:sublist(
+          lists:reverse(
+            lists:keysort(
+              2,
+              mnesia:transaction(
+                fun() ->
+                        mnesia:select(fart_rating,
+                                      [{#fart_rating{name = '$1', rating = '$2', _ = '_'}, [], [{'$1', '$2'}]}])
+                end))),
+          1, 10)),
+      ", ").
