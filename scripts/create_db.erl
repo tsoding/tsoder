@@ -4,7 +4,7 @@
 -include("../src/fart_rating.hrl").
 
 %% TODO(#106): create_db.erl should always use mnesia dir defined in `./config/sys.config`
-%% TODO: implement mnesia schema migrations
+%% TODO(#107): implement mnesia schema migrations
 main([MnesiaDir]) ->
     error_logger:info_report([{node, node()},
                               {mnesia_dir, MnesiaDir}]),
