@@ -64,6 +64,5 @@ _build/
 # End of https://www.gitignore.io/api/emacs,erlang
 
 logs/
-state/
 releases/
 tsoder.mnesia/
