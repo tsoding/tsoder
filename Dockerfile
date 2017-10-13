@@ -2,7 +2,7 @@ FROM alpine:3.3
 
 MAINTAINER Alexey Kutepov <reximkut@gmail.com>
 
-ENV OTP_VERSION 18.3
+ENV OTP_VERSION 19.0
 
 # Download the Erlang/OTP source
 RUN mkdir /buildroot
