@@ -6,8 +6,8 @@
 %% TODO: implement mnesia schema migrations
 main([MnesiaDir]) ->
     application:set_env(mnesia, dir, MnesiaDir),
-    mnesia:create_schema([node()]),
-    mnesia:start(),
-    mnesia:create_table(fart_rating,
-                        [{attributes, record_info(fields, fart_rating)},
-                         {disc_only_copies, [node()]}]).
+    ok = mnesia:create_schema([node()]),
+    ok = mnesia:start(),
+    {atomic, ok} = mnesia:create_table(fart_rating,
+                                       [{attributes, record_info(fields, fart_rating)},
+                                        {disc_only_copies, [node()]}]).
