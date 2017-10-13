@@ -44,7 +44,7 @@ RUN ./scripts/create_db.erl "/tmp/tsoder.mnesia/"
 RUN rebar3 release -o /artifacts
 
 # TODO(#85): Document how to properly backup the volume
-# TODO: Extract log/ folder to volume
+# TODO(#105): Extract log/ folder to volume
 # Create a volume
 VOLUME ["/tmp/tsoder.mnesia/"]
 
