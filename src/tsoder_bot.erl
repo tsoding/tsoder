@@ -8,6 +8,8 @@
 
 -record(state, { channel = nothing }).
 
+-include("fart_rating.hrl").
+
 start_link() ->
     gen_server:start_link({local, tsoder_bot}, ?MODULE, [], []).
 
@@ -109,7 +111,8 @@ fart_command(State, User, _) ->
               Channel ! string_as_user_response(User,
                                                 "don't have intestines to perform the operation, sorry."),
               fart_rating:bump_counter(User)
-      end),
+      end,
+      State#state.channel),
     State.
 
 help_command(State, User, "") ->
