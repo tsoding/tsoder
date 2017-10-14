@@ -141,7 +141,7 @@ addquote_command(State, User, Quote) ->
       State#state.channel),
     State.
 
-quote_command(State, User, "") ->
+quote_command(State, User, _) ->
     option:foreach(
       fun (Channel) ->
               option:foreach(
