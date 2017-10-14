@@ -1,0 +1,1 @@
+-record(quote, { id, quote, user, timestamp }).
