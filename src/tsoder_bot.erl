@@ -128,7 +128,7 @@ addquote_command(State, User, "") ->
 addquote_command(State, User, Quote) ->
     option:foreach(
       fun (Channel) ->
-              %% TODO: design a more advanced authentication system for commands
+              %% TODO(#109): design a more advanced authentication system for commands
               Authorized = lists:member(User, ["tsoding", "r3x1m", "bpaf"]),
               if
                   Authorized ->
