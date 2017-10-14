@@ -1,0 +1,1 @@
+-record(unique_ids, {type, id}).

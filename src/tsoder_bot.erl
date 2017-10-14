@@ -9,6 +9,7 @@
 -record(state, { channel = nothing }).
 
 -include("fart_rating.hrl").
+-include("quote_database.hrl").
 
 start_link() ->
     gen_server:start_link({local, tsoder_bot}, ?MODULE, [], []).
@@ -53,10 +54,12 @@ handle_cast(Event, State) ->
 
 command_table() ->
     #{
-       "hi"   => { fun hi_command/3, "!hi -- says hi to you" },
-       "help" => { fun help_command/3, "!help [command] -- prints the list of supported commands." },
-       "fart" => { fun fart_command/3, "!fart [rating] -- fart" }%% ,
-       %% "ub"   => { fun ub_command/3, "!ub [term] -- Lookup the term in Urban Dictionary" }
+       "hi"   => { fun hi_command/3, "!hi -- says hi to you" }
+     , "help" => { fun help_command/3, "!help [command] -- prints the list of supported commands." }
+     , "fart" => { fun fart_command/3, "!fart [rating] -- fart" }
+     , "addquote" => { fun addquote_command/3, "!addquote <quote> -- add a quote to the quote database" }
+     , "quote" => { fun quote_command/3, "!quote [id] -- select a quote from the quote database" }
+     %% , "ub"   => { fun ub_command/3, "!ub [term] -- Lookup the term in Urban Dictionary" }
      }.
 
 ub_command(State, User, "") ->
@@ -109,8 +112,47 @@ fart_command(State, User, _) ->
     option:foreach(
       fun (Channel) ->
               Channel ! string_as_user_response(User,
-                                                "don't have intestines to perform the operation, sorry."),
+                                                "don't have intestines to perform the operation."),
               fart_rating:bump_counter(User)
+      end,
+      State#state.channel),
+    State.
+
+addquote_command(State, User, "") ->
+    option:foreach(
+      fun (Channel) ->
+              Channel ! string_as_user_response(User, "I don't care about empty quotes! Give me something substantial you peasant!")
+      end,
+      State#state.channel),
+    State;
+addquote_command(State, User, Quote) ->
+    option:foreach(
+      fun (Channel) ->
+              %% TODO: design a more advanced authentication system for commands
+              Authorized = lists:member(User, ["tsoding", "r3x1m", "bpaf"]),
+              if
+                  Authorized ->
+                      Id = quote_database:add_quote(Quote, User, erlang:timestamp()),
+                      Channel ! string_as_user_response(User, "Added your stupid quote under number " ++ integer_to_list(Id));
+                  true ->
+                      Channel ! string_as_user_response(User, "Only bpaf is allowed to use this command!")
+              end
+      end,
+      State#state.channel),
+    State.
+
+quote_command(State, User, "") ->
+    option:foreach(
+      fun (Channel) ->
+              option:foreach(
+                fun (Quote) ->
+                        Channel ! string_as_user_response(User,
+                                                          Quote#quote.quote
+                                                          ++ " ("
+                                                          ++ integer_to_list(Quote#quote.id)
+                                                          ++ ")")
+                end,
+                quote_database:random())
       end,
       State#state.channel),
     State.

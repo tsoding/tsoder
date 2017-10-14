@@ -10,6 +10,7 @@
 %% Application callbacks
 -export([start/2, stop/1]).
 -include("fart_rating.hrl").
+-include("quote_database.hrl").
 
 %%====================================================================
 %% API
@@ -18,7 +19,11 @@
 
 start(_StartType, _StartArgs) ->
     start_logging(),
-    ok = mnesia:wait_for_tables([fart_rating], 5000),
+    ok = mnesia:wait_for_tables([ unique_ids
+                                , fart_rating
+                                , quote
+                                ],
+                                5000),
     tsoder_sup:start_link().
 
 %%--------------------------------------------------------------------
