@@ -121,7 +121,7 @@ fart_command(State, User, _) ->
 addquote_command(State, User, "") ->
     option:foreach(
       fun (Channel) ->
-              Channel ! string_as_user_response(User, "I don't care about empty quotes! Give me something substantial you peasant!")
+              Channel ! string_as_user_response(User, "Empty quotes are ignored")
       end,
       State#state.channel),
     State;
@@ -133,7 +133,7 @@ addquote_command(State, User, Quote) ->
               if
                   Authorized ->
                       Id = quote_database:add_quote(Quote, User, erlang:timestamp()),
-                      Channel ! string_as_user_response(User, "Added your stupid quote under number " ++ integer_to_list(Id));
+                      Channel ! string_as_user_response(User, "Added the quote under number " ++ integer_to_list(Id));
                   true ->
                       Channel ! string_as_user_response(User, "Only bpaf is allowed to use this command!")
               end
