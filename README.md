@@ -26,7 +26,28 @@ $ rebar3 eunit
 
 ```console
 $ docker build -t tsoder .
-$ docker create -e ACCESS_TOKEN="<access-token>" -e TSODER_CHANNEL="<channel-name>" --name morning-tsoding tsoder
-$ docker start morning-tsoding
+$ docker create -e ACCESS_TOKEN="<access-token>" \
+                -e TSODER_CHANNEL="<channel-name>" \
+                --name morning-tsoding tsoder
+$ docker start -a morning-tsoding
 $ docker stop morning-tsoding
 ```
+
+### Database Volume Backup
+
+Tsoder Docker Image has a volume at `/tmp/tsoder.mnesia/` (see Dockerfile for more details) where the application keeps its database. The Dockerfile script creates the `/tmp/tsoder.mnesia` folder and initializes [Mnesia][mnesia] database inside of it with the `./scripts/create_db.erl` script. But if you want to constantly backup your database it is recommended to initialize the [Mnesia][mnesia] database outside of the Docker Image manually with `./scripts/create_db.erl` script:
+
+```console
+$ ./scripts/create_db.erl ./tsoder.mnesia/
+```
+
+And bind mount the external folder to `/tmp/tsoder.mnesia/` volume on the container creation:
+
+```console
+$ docker create -e ACCESS_TOKEN="<access-token>" \
+                -e TSODER_CHANNEL="<channel-name>" \
+                -v /absolute/path/to/tsoder.mnesia/:/tmp/tsoder.mnesia/ \
+                --name morning-tsoding tsoder
+```
+
+[mnesia]: http://erlang.org/doc/apps/mnesia/Mnesia_chap2.html
