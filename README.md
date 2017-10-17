@@ -46,7 +46,7 @@ And bind mount the external folder to `/tmp/tsoder.mnesia/` volume on the contai
 ```console
 $ docker create -e ACCESS_TOKEN="<access-token>" \
                 -e TSODER_CHANNEL="<channel-name>" \
-                -v /absolute/path/to/tsoder.mnesia/:/tmp/tsoder.mnesia/
+                -v /absolute/path/to/tsoder.mnesia/:/tmp/tsoder.mnesia/ \
                 --name morning-tsoding tsoder
 ```
 
