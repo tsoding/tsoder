@@ -73,7 +73,7 @@ command_table() ->
        %% This command system should replace hardcoded temporary
        %% commands like !nov2017
      , "nov2017" => { fun nov2017_command/3, "!nov2017 [user] -- November 2017 Morning Tsoding Planning Announcement" }
-     %% TODO: Design a more advanced mechanism for disabling/enabling commands
+     %% TODO(#115): Design a more advanced mechanism for disabling/enabling commands
      %% , "ub"   => { fun ub_command/3, "!ub [term] -- Lookup the term in Urban Dictionary" }
      }.
 
