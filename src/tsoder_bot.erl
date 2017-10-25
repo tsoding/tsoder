@@ -59,7 +59,7 @@ command_table() ->
      , "fart" => { fun fart_command/3, "!fart [rating] -- fart" }
      , "addquote" => { fun addquote_command/3, "!addquote <quote> -- add a quote to the quote database" }
      , "quote" => { fun quote_command/3, "!quote [id] -- select a quote from the quote database" }
-       %% TODO: Implement custom response command system
+       %% TODO(#114): Implement custom response command system
        %%
        %% - `!addcommand <command-name> <text>`
        %% - `!removecommand <command-name>`
