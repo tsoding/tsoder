@@ -1,5 +1,9 @@
 {"1.1.0",
-[{<<"jiffy">>,{pkg,<<"jiffy">>,<<"0.14.11">>},0}]}.
+[{<<"jiffy">>,{pkg,<<"jiffy">>,<<"0.14.11">>},0},
+ {<<"migresia">>,
+  {git,"git@github.com:yoonka/migresia.git",
+       {ref,"40e11825e01502d045e87bf8b5d7dc5a9d6e3f73"}},
+  0}]}.
 [
 {pkg_hash,[
  {<<"jiffy">>, <<"919A87D491C5A6B5E3BBC27FAFEDC3A0761CA0B4C405394F121F582FD4E3F0E5">>}]}

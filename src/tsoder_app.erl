@@ -9,8 +9,6 @@
 
 %% Application callbacks
 -export([start/2, stop/1]).
--include("fart_rating.hrl").
--include("quote_database.hrl").
 
 %%====================================================================
 %% API
@@ -19,6 +17,7 @@
 
 start(_StartType, _StartArgs) ->
     start_logging(),
+    ok = migresia:migrate(tsoder),
     ok = mnesia:wait_for_tables([ unique_ids
                                 , fart_rating
                                 , quote

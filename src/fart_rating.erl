@@ -2,7 +2,7 @@
 -export([bump_counter/1,
          as_string/0]).
 
--include("fart_rating.hrl").
+-include_lib("tsoder/include/tables/fart_rating.hrl").
 
 bump_counter(User) ->
     mnesia:sync_transaction(

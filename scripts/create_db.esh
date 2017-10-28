@@ -1,0 +1,10 @@
+#!/usr/bin/env escript
+%%! -name tsoder@node
+
+%% TODO(#106): create_db.erl should always use mnesia dir defined in `./config/sys.config`
+%% TODO: usage splash for create_db script
+main([MnesiaDir]) ->
+    error_logger:info_report([{node, node()},
+                              {mnesia_dir, MnesiaDir}]),
+    application:set_env(mnesia, dir, MnesiaDir),
+    mnesia:create_schema([node()]).
