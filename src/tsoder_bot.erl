@@ -8,8 +8,8 @@
 
 -record(state, { channel = nothing }).
 
--include("fart_rating.hrl").
--include("quote_database.hrl").
+-include_lib("tsoder/include/tables/fart_rating.hrl").
+-include_lib("tsoder/include/tables/quote_database.hrl").
 
 start_link() ->
     gen_server:start_link({local, tsoder_bot}, ?MODULE, [], []).

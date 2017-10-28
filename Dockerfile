@@ -40,7 +40,7 @@ WORKDIR /buildroot
 RUN mkdir tsoder/
 COPY . tsoder/
 WORKDIR tsoder/
-RUN ./scripts/create_db.erl "/tmp/tsoder.mnesia/"
+RUN ./scripts/create_db.esh "/tmp/tsoder.mnesia/"
 RUN rebar3 release -o /artifacts
 
 # TODO(#105): Extract log/ folder to volume

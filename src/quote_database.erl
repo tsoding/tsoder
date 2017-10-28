@@ -1,7 +1,7 @@
 -module(quote_database).
 -export([ add_quote/3
         , random/0 ]).
--include("quote_database.hrl").
+-include_lib("tsoder/include/tables/quote_database.hrl").
 
 add_quote(Quote, User, Timestamp) ->
     Id = mnesia:dirty_update_counter(unique_ids, quote, 1),
