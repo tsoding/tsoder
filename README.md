@@ -1,6 +1,12 @@
 [![Build Status](https://travis-ci.org/tsoding/tsoder.svg?branch=master)](https://travis-ci.org/tsoding/tsoder)
 [![codecov](https://codecov.io/gh/tsoding/tsoder/branch/master/graph/badge.svg)](https://codecov.io/gh/tsoding/tsoder)
 
+# WARNING! CONTAINS SUBMODULES! CLONE RECURSIVELY!
+
+```console
+$ git clone --recursive git://github.com/tsoding/tsoder.git
+```
+
 # tsoder
 
 Bot for Tsoding streams
