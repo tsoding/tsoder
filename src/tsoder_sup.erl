@@ -39,7 +39,7 @@ init([]) ->
                                    shutdown => brutal_kill,
                                    type => worker},
                                  #{id => russify,
-                                   start => {russify, start_link, ["./priv/mazarusha/mazarusha.json"]},
+                                   start => {russify, start_link, [[code:priv_dir(tsoder), "/mazarusha/mazarusha.json"]]},
                                    restart => permanent,
                                    shutdown => brutal_kill,
                                    type => worker}]} }.
