@@ -59,6 +59,7 @@ command_table() ->
      , "fart" => { fun fart_command/3, "!fart [rating] -- fart" }
      , "addquote" => { fun addquote_command/3, "!addquote <quote> -- add a quote to the quote database" }
      , "quote" => { fun quote_command/3, "!quote [id] -- select a quote from the quote database" }
+     , "russify" => { fun russify_command/3, "!russify <western-spy-text> -- russify western spy text" }
        %% TODO(#114): Implement custom response command system
        %%
        %% - `!addcommand <command-name> <text>`
@@ -72,22 +73,9 @@ command_table() ->
        %%
        %% This command system should replace hardcoded temporary
        %% commands like !nov2017
-     , "nov2017" => { fun nov2017_command/3, "!nov2017 [user] -- November 2017 Morning Tsoding Planning Announcement" }
      %% TODO(#115): Design a more advanced mechanism for disabling/enabling commands
      %% , "ub"   => { fun ub_command/3, "!ub [term] -- Lookup the term in Urban Dictionary" }
      }.
-
-nov2017_command(State, User, DestUser) ->
-    Nov2017Text = "November 2017 Planning is In Progress! Watch Announcement Video: https://www.youtube.com/watch?v=fH0Lqn4RoF0 Vote Here: http://www.strawpoll.me/14222115",
-    option:foreach(
-      fun (Channel) ->
-              case DestUser of
-                  [] -> Channel ! string_as_user_response(User, Nov2017Text);
-                  DestUser -> Channel ! string_as_user_response(DestUser, Nov2017Text)
-              end
-      end,
-      State#state.channel),
-    State.
 
 ub_command(State, User, "") ->
     option:foreach(
@@ -184,6 +172,15 @@ quote_command(State, User, _) ->
       State#state.channel),
     State.
 
+russify_command(State, User, Text) ->
+    option:foreach(
+     fun(Channel) ->
+             Channel ! string_as_user_response(User,
+                                               gen_server:call(russify, binary:list_to_bin(Text)))
+     end,
+      State#state.channel),
+    State.
+
 help_command(State, User, "") ->
    option:foreach(
      fun (Channel) ->
@@ -208,4 +205,4 @@ help_command(State, User, Command) ->
     State.
 
 string_as_user_response(User, String) ->
-    {message, "@" ++ User ++ ", " ++ String}.
+    {message, ["@", User, ", ", String]}.
