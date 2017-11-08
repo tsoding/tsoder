@@ -1,0 +1,3 @@
+[submodule "priv/mazarusha"]
+	path = priv/mazarusha
+	url = git://github.com/tsoding/mazarusha.git
