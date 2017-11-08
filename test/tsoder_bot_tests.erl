@@ -26,21 +26,21 @@ join_test_() ->
                ?_test(begin
                           gen_server:cast(tsoder_bot, {message, "khooy", "!help"}),
                           receive
-                              Msg -> ?assertMatch({message, "@khooy, supported commands: addquote, fart, help, hi, nov2017, quote. Source code: https://github.com/tsoding/tsoder"}, Msg)
+                              Msg -> ?assertMatch({message, ["@", "khooy", ", ", "supported commands: addquote, fart, help, hi, quote, russify. Source code: https://github.com/tsoding/tsoder"]}, Msg)
                           end
                       end)},
               {timeout, 1,
                ?_test(begin
                           gen_server:cast(tsoder_bot, {message, "khooy", "!help help"}),
                           receive
-                              Msg -> ?assertMatch({message, "@khooy, !help [command] -- prints the list of supported commands."}, Msg)
+                              Msg -> ?assertMatch({message, ["@", "khooy", ", ", "!help [command] -- prints the list of supported commands."]}, Msg)
                           end
                       end)},
               {timeout, 1,
                ?_test(begin
                           gen_server:cast(tsoder_bot, {message, "khooy", "!help khooy"}),
                           receive
-                              Msg -> ?assertMatch({message, "@khooy, never heard of khooy"}, Msg)
+                              Msg -> ?assertMatch({message, ["@", "khooy", ", ", "never heard of khooy"]}, Msg)
                           end
                       end)},
               {timeout, 1,
