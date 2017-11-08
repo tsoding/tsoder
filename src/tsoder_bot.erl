@@ -175,7 +175,8 @@ quote_command(State, User, _) ->
 russify_command(State, User, Text) ->
     option:foreach(
      fun(Channel) ->
-             Channel ! {message, ["@", User, ", ", gen_server:call(russify, binary:list_to_bin(Text))]}
+             Channel ! string_as_user_response(User,
+                                               gen_server:call(russify, binary:list_to_bin(Text)))
      end,
       State#state.channel),
     State.
@@ -204,4 +205,4 @@ help_command(State, User, Command) ->
     State.
 
 string_as_user_response(User, String) ->
-    {message, "@" ++ User ++ ", " ++ String}.
+    {message, ["@", User, ", ", String]}.
