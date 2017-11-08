@@ -59,6 +59,7 @@ command_table() ->
      , "fart" => { fun fart_command/3, "!fart [rating] -- fart" }
      , "addquote" => { fun addquote_command/3, "!addquote <quote> -- add a quote to the quote database" }
      , "quote" => { fun quote_command/3, "!quote [id] -- select a quote from the quote database" }
+     , "russify" => { fun russify_command/3, "!russify <western-spy-text> -- russify western spy text" }
        %% TODO(#114): Implement custom response command system
        %%
        %% - `!addcommand <command-name> <text>`
@@ -168,6 +169,14 @@ quote_command(State, User, _) ->
                 end,
                 quote_database:random())
       end,
+      State#state.channel),
+    State.
+
+russify_command(State, User, Text) ->
+    option:foreach(
+     fun(Channel) ->
+             Channel ! {message, ["@", User, ", ", gen_server:call(russify, binary:list_to_bin(Text))]}
+     end,
       State#state.channel),
     State.
 

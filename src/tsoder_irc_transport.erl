@@ -9,7 +9,10 @@ start_transport() ->
 %%====================================================================
 
 remove_newlines(Text) ->
-    re:replace(Text, "[\n\r]+", " ", [{return, list}, global]).
+    if
+        is_list(Text) -> re:replace(Text, "[\n\r]+", " ", [{return, list}, global]);
+        true -> Text
+    end.
 
 authorize(Sock, Login, Password, Channel) ->
     ok = ssl:send(Sock, "PASS " ++ Password ++ "\n"),
@@ -17,7 +20,7 @@ authorize(Sock, Login, Password, Channel) ->
     ok = ssl:send(Sock, "JOIN #" ++ Channel ++"\n").
 
 send_message(Sock, Message, Channel) ->
-    IrcMessage = "PRIVMSG #" ++ Channel ++ " :" ++ remove_newlines(Message) ++ "\n",
+    IrcMessage = ["PRIVMSG #", Channel, " :", remove_newlines(Message), "\n"],
     error_logger:info_msg(IrcMessage),
     ok = ssl:send(Sock, IrcMessage).
 
