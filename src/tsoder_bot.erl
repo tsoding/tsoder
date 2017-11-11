@@ -144,13 +144,13 @@ addquote_command(State, User, Quote) ->
     option:foreach(
       fun (Channel) ->
               %% TODO(#109): design a more advanced authentication system for commands
-              Authorized = lists:member(User, ["tsoding", "r3x1m", "bpaf"]),
+              Authorized = lists:member(User, ["tsoding", "r3x1m"]),
               if
                   Authorized ->
                       Id = quote_database:add_quote(Quote, User, erlang:timestamp()),
                       Channel ! string_as_user_response(User, "Added the quote under number " ++ integer_to_list(Id));
                   true ->
-                      Channel ! string_as_user_response(User, "Only bpaf is allowed to use this command!")
+                      Channel ! string_as_user_response(User, "Nope")
               end
       end,
       State#state.channel),
