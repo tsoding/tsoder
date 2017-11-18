@@ -1,6 +1,7 @@
 -module(quote_database).
 -export([ add_quote/3
-        , random/0 ]).
+        , random/0
+        , quote/1 ]).
 -include("quote_database.hrl").
 
 add_quote(Quote, User, Timestamp) ->
@@ -25,5 +26,14 @@ random() ->
                               [Quote] = mnesia:read(quote, Key),
                               {ok, Quote}
                   end
+          end),
+    Result.
+
+quote(Key) ->
+    {atomic, Result} =
+        mnesia:transaction(
+          fun () ->
+                  [Quote] = mnesia:read(quote, Key),
+                  {ok, Quote}
           end),
     Result.
