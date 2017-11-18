@@ -171,18 +171,21 @@ quote_command(State, User, []) ->
       end,
       State#state.channel),
     State;
-quote_command(State, User, Id) ->
+quote_command(State, User, Arg) ->
     option:foreach(
       fun (Channel) ->
-              option:foreach(
-               fun (Quote) ->
-                       Channel ! string_as_user_response(User,
-                                                          Quote#quote.quote
-                                                          ++ " ("
-                                                          ++ integer_to_list(Quote#quote.id)
-                                                          ++ ")")
-               end,
-               quote_database:quote(Id))
+              case string:to_integer(Arg) of
+                  {Id, []} -> option:foreach(
+                                fun (Quote) ->
+                                        Channel ! string_as_user_response(User,
+                                                                          Quote#quote.quote
+                                                                          ++ " ("
+                                                                          ++ integer_to_list(Quote#quote.id)
+                                                                          ++ ")")
+                                end,
+                                quote_database:quote(Id));
+                  _ -> nothing
+              end
       end,
       State#state.channel),
     State.
