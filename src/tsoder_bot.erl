@@ -156,7 +156,7 @@ addquote_command(State, User, Quote) ->
       State#state.channel),
     State.
 
-quote_command(State, User, _) ->
+quote_command(State, User, []) ->
     option:foreach(
       fun (Channel) ->
               option:foreach(
@@ -170,7 +170,23 @@ quote_command(State, User, _) ->
                 quote_database:random())
       end,
       State#state.channel),
+    State;
+quote_command(State, User, Id) ->
+    option:foreach(
+      fun (Channel) ->
+              option:foreach(
+               fun (Quote) ->
+                       Channel ! string_as_user_response(User,
+                                                          Quote#quote.quote
+                                                          ++ " ("
+                                                          ++ integer_to_list(Quote#quote.id)
+                                                          ++ ")")
+               end,
+               quote_database:quote(Id))
+      end,
+      State#state.channel),
     State.
+
 
 russify_command(State, User, Text) ->
     option:foreach(
