@@ -33,7 +33,9 @@ quote(Key) ->
     {atomic, Result} =
         mnesia:transaction(
           fun () ->
-                  [Quote] = mnesia:read(quote, Key),
-                  {ok, Quote}
+                  case mnesia:read(quote, Key) of
+                      [] -> nothing;
+                      [Quote] -> {ok, Quote}
+                  end
           end),
     Result.
