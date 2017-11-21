@@ -12,7 +12,7 @@ join_test_() ->
                ?_test(begin
                           gen_server:cast(tsoder_bot, {join, self()}),
                           receive
-                              Msg -> ?assertMatch({message, "Hello from Tsoder again!"}, Msg)
+                              Msg -> ?assertMatch({message, "I came tsodinNERD"}, Msg)
                           end
                       end)},
               {timeout, 1,

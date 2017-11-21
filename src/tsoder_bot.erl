@@ -44,7 +44,7 @@ handle_cast({message, User, Message}, State) ->
     };
 handle_cast({join, Channel}, State) ->
     error_logger:info_report([{join, Channel}]),
-    Channel ! {message, "Hello from Tsoder again!"},
+    Channel ! {message, "I came tsodinNERD"},
     {noreply, State#state{channel = {ok, Channel}}};
 handle_cast(Event, State) ->
     error_logger:info_report([{unknown_event, Event}]),
@@ -150,7 +150,7 @@ addquote_command(State, User, Quote) ->
                       Id = quote_database:add_quote(Quote, User, erlang:timestamp()),
                       Channel ! string_as_user_response(User, "Added the quote under number " ++ integer_to_list(Id));
                   true ->
-                      Channel ! string_as_user_response(User, "Nope")
+                      Channel ! string_as_user_response(User, "Nope tsodinNERD")
               end
       end,
       State#state.channel),
