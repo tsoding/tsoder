@@ -150,7 +150,7 @@ addquote_command(State, User, Quote) ->
                       Id = quote_database:add_quote(Quote, User, erlang:timestamp()),
                       Channel ! string_as_user_response(User, "Added the quote under number " ++ integer_to_list(Id));
                   true ->
-                      Channel ! string_as_user_response(User, "Nope")
+                      Channel ! string_as_user_response(User, "Nope tsodinNERD")
               end
       end,
       State#state.channel),
