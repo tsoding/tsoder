@@ -22,7 +22,7 @@ random() ->
           fun () ->
                   case mnesia:all_keys(quote) of
                       [] -> nothing;
-                      Keys -> Key = lists:nth(random:uniform(length(Keys)), Keys),
+                      Keys -> Key = lists:nth(rand:uniform(length(Keys)), Keys),
                               [Quote] = mnesia:read(quote, Key),
                               {ok, Quote}
                   end
