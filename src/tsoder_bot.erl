@@ -15,6 +15,9 @@ start_link() ->
     gen_server:start_link({local, tsoder_bot}, ?MODULE, [], []).
 
 init([]) ->
+    random:seed(erlang:phash2([node()]),
+                erlang:monotonic_time(),
+                erlang:unique_integer()),
     {ok, #state{}}.
 
 terminate(Reason, State) ->
