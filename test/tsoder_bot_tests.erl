@@ -10,51 +10,46 @@ join_test_() ->
      fun(_) ->
              [{timeout, 1,
                ?_test(begin
-                          gen_server:cast(tsoder_bot, {join, self()}),
-                          receive
-                              Msg -> ?assertMatch({message, "I came tsodinNERD"}, Msg)
-                          end
+                          ?assertMatch({message, "I came tsodinNERD"},
+                                       gen_server:call(tsoder_bot, {join, self()}))
                       end)},
               {timeout, 1,
                ?_test(begin
-                          gen_server:cast(tsoder_bot, {message, "khooy", "!hi"}),
-                          receive
-                              Msg -> ?assertMatch({message, "Hello @khooy!"}, Msg)
-                          end
+                          ?assertMatch({message, "Hello @khooy!"},
+                                       gen_server:call(tsoder_bot, {message, "khooy", "!hi"}))
                       end)},
               {timeout, 1,
                ?_test(begin
-                          gen_server:cast(tsoder_bot, {message, "khooy", "!help"}),
-                          receive
-                              Msg -> ?assertMatch({message, ["@", "khooy", ", ", "supported commands: addquote, fart, help, hi, quote, russify. Source code: https://github.com/tsoding/tsoder"]}, Msg)
-                          end
+                          ?assertMatch({message, [ "@"
+                                                 , "khooy"
+                                                 , ", "
+                                                 , "supported commands: addquote, fart, help, hi, quote, russify. Source code: https://github.com/tsoding/tsoder"]},
+                                       gen_server:call(tsoder_bot, {message, "khooy", "!help"}))
                       end)},
               {timeout, 1,
                ?_test(begin
-                          gen_server:cast(tsoder_bot, {message, "khooy", "!help help"}),
-                          receive
-                              Msg -> ?assertMatch({message, ["@", "khooy", ", ", "!help [command] -- prints the list of supported commands."]}, Msg)
-                          end
+                          ?assertMatch({message, [ "@"
+                                                 , "khooy"
+                                                 , ", "
+                                                 , "!help [command] -- prints the list of supported commands."]},
+                                       gen_server:call(tsoder_bot, {message, "khooy", "!help help"}))
                       end)},
               {timeout, 1,
                ?_test(begin
-                          gen_server:cast(tsoder_bot, {message, "khooy", "!help khooy"}),
-                          receive
-                              Msg -> ?assertMatch({message, ["@", "khooy", ", ", "never heard of khooy"]}, Msg)
-                          end
+                          ?assertMatch({message, [ "@"
+                                                 , "khooy"
+                                                 , ", "
+                                                 , "never heard of khooy"]},
+                                       gen_server:call(tsoder_bot, {message, "khooy", "!help khooy"}))
                       end)},
               {timeout, 1,
                ?_test(begin
-                          gen_server:cast(tsoder_bot, unknown_event),
-                          receive
-                              _ ->
-                                  erlang:error("Process sent something on incorrect event")
-                          after
-                              500 ->
-                                  ?assert(true)
-                          end
+                          ?assertMatch(unsupported,
+                                       gen_server:call(tsoder_bot, unknown_event))
                       end)},
               {timeout, 1,
-               ?_test(?assertMatch(unsupported,
-                                   gen_server:call(tsoder_bot, {message, "!hi"})))}]
+               ?_test(begin
+                          ?assertMatch(nomessage,
+                                       gen_server:call(tsoder_bot, {message, "khooy", "Just a regular message"}))
+                      end)}]
      end}.
