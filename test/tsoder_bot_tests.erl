@@ -46,5 +46,10 @@ join_test_() ->
                ?_test(begin
                           ?assertMatch(unsupported,
                                        gen_server:call(tsoder_bot, unknown_event))
+                      end)},
+              {timeout, 1,
+               ?_test(begin
+                          ?assertMatch(nomessage,
+                                       gen_server:call(tsoder_bot, {message, "khooy", "Just a regular message"}))
                       end)}]
      end}.

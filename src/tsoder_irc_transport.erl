@@ -27,6 +27,13 @@ send_message(Sock, Message, Channel) ->
 quit(Sock) ->
     ok = ssl:send(Sock, "QUIT\n").
 
+handle_tsoder_bot_reply(nomessage, Sock, Channel) ->
+    ok;
+handle_tsoder_bot_reply({message, Message}, Sock, Channel) ->
+    send_message(Sock, Message, Channel);
+handle_tsoder_bot_reply(Reply, _, _) ->
+    error_logger:info_report({unknown_tsoder_bot_reply, Reply}).
+
 loop(Sock, Channel) ->
     receive
         {ssl, Sock, Data} ->
@@ -35,10 +42,10 @@ loop(Sock, Channel) ->
                       error_logger:info_msg("Received a PING command from ~s PONGing back~n", [Host]),
                       ssl:send(Sock, "PONG " ++ Host ++ "\n");
                   ({privmsg, User, Msg}) ->
-                      case gen_server:call(tsoder_bot, {message, User, Msg}, 1000) of
-                          {message, Message} -> send_message(Sock, Message, Channel);
-                          _ -> nothing
-                      end
+                      handle_tsoder_bot_reply(
+                        gen_server:call(tsoder_bot, {message, User, Msg}, 1000),
+                        Sock,
+                        Channel)
               end,
               irc_command:of_line(Data)),
             error_logger:info_msg(Data),
@@ -50,7 +57,10 @@ loop(Sock, Channel) ->
             ok;
         quit ->
             error_logger:info_msg("Quitting by operator request..."),
-            ok
+            ok;
+        Msg ->
+            error_logger:info_report({unknown_message, Msg}),
+            loop(Sock, Channel)
     end.
 
 transport_entry() ->
@@ -62,10 +72,10 @@ transport_entry() ->
                              [binary, {packet, 0}]),
 
     authorize(Sock, "TsoderBot", Password, Channel),
-    case gen_server:call(tsoder_bot, {join, self()}, 1000) of
-        {message, Message} -> send_message(Sock, Message, Channel);
-        _ -> nothing
-    end,
+    handle_tsoder_bot_reply(
+      gen_server:call(tsoder_bot, {join, self()}, 1000),
+      Sock,
+      Channel),
     ok = loop(Sock, Channel),
     quit(Sock),
 

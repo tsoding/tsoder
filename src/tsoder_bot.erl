@@ -25,7 +25,7 @@ terminate(Reason, State) ->
 
 handle_call({message, User, Message}, _, State) ->
     option:default(
-      {noreply, State},
+      { reply, nomessage, State },
       option:map(
         fun ({Command, Arguments}) ->
                 case command_table() of
@@ -34,7 +34,7 @@ handle_call({message, User, Message}, _, State) ->
                     _ ->
                         error_logger:info_report({unsupported_command,
                                                   {Command, Arguments}}),
-                        { noreply, State }
+                        { reply, nomessage, State }
                 end
         end,
         user_command:of_string(Message)));
@@ -131,7 +131,7 @@ quote_command(User, []) ->
 quote_command(User, Arg) ->
     case string:to_integer(Arg) of
         {Id, []} -> option:default(
-                      {message, "tsodinNERD"},
+                      nomessage,
                       option:map(
                         fun (Quote) ->
                                 string_as_user_response(User,
@@ -141,7 +141,7 @@ quote_command(User, Arg) ->
                                                         ++ ")")
                         end,
                         quote_database:quote(Id)));
-        _ -> {message, "tsodinNERD"}
+        _ -> nomessage
     end.
 
 
