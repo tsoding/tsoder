@@ -6,8 +6,6 @@
          handle_cast/2,
          terminate/2]).
 
--record(state, { channel = nothing }).
-
 -include("fart_rating.hrl").
 -include("quote_database.hrl").
 
@@ -19,51 +17,46 @@ init([]) ->
               {erlang:phash2([node()]),
                erlang:monotonic_time(),
                erlang:unique_integer()}),
-    {ok, #state{}}.
+    {ok, {}}.
 
 terminate(Reason, State) ->
     error_logger:info_report([{reason, Reason},
                               {state, State}]).
 
+handle_call({message, User, Message}, _, State) ->
+    option:default(
+      {noreply, State},
+      option:map(
+        fun ({Command, Arguments}) ->
+                case command_table() of
+                    #{ Command := { Action, _ } } ->
+                        { reply, Action(User, Arguments), State };
+                    _ ->
+                        error_logger:info_report({unsupported_command,
+                                                  {Command, Arguments}}),
+                        { noreply, State }
+                end
+        end,
+        user_command:of_string(Message)));
+handle_call({join, _}, _, State) ->
+    {reply, {message, "I came tsodinNERD"}, State};
 handle_call(_, _, State) ->
     {reply, unsupported, State}.
 
-handle_cast({message, User, Message}, State) ->
-    error_logger:info_report([{message, Message}]),
-
-    {noreply,
-     option:default(State,
-       option:map(
-         fun ({Command, Arguments}) ->
-                 case command_table() of
-                     #{ Command := { Action, _ } } ->
-                         Action(State, User, Arguments);
-                     _ ->
-                         error_logger:info_report({unsupported_command,
-                                                   {Command, Arguments}}),
-                         State
-                 end
-         end,
-         user_command:of_string(Message)))
-    };
-handle_cast({join, Channel}, State) ->
-    error_logger:info_report([{join, Channel}]),
-    Channel ! {message, "I came tsodinNERD"},
-    {noreply, State#state{channel = {ok, Channel}}};
-handle_cast(Event, State) ->
-    error_logger:info_report([{unknown_event, Event}]),
+handle_cast(_, State) ->
+    error_logger:info_report(unsupported),
     {noreply, State}.
 
 %% Internal %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 command_table() ->
     #{
-       "hi"   => { fun hi_command/3, "!hi -- says hi to you" }
-     , "help" => { fun help_command/3, "!help [command] -- prints the list of supported commands." }
-     , "fart" => { fun fart_command/3, "!fart [rating] -- fart" }
-     , "addquote" => { fun addquote_command/3, "!addquote <quote> -- add a quote to the quote database" }
-     , "quote" => { fun quote_command/3, "!quote [id] -- select a quote from the quote database" }
-     , "russify" => { fun russify_command/3, "!russify <western-spy-text> -- russify western spy text" }
+       "hi"   => { fun hi_command/2, "!hi -- says hi to you" }
+     , "help" => { fun help_command/2, "!help [command] -- prints the list of supported commands." }
+     , "fart" => { fun fart_command/2, "!fart [rating] -- fart" }
+     , "addquote" => { fun addquote_command/2, "!addquote <quote> -- add a quote to the quote database" }
+     , "quote" => { fun quote_command/2, "!quote [id] -- select a quote from the quote database" }
+     , "russify" => { fun russify_command/2, "!russify <western-spy-text> -- russify western spy text" }
        %% TODO(#114): Implement custom response command system
        %%
        %% - `!addcommand <command-name> <text>`
@@ -81,151 +74,93 @@ command_table() ->
      %% , "ub"   => { fun ub_command/3, "!ub [term] -- Lookup the term in Urban Dictionary" }
      }.
 
-ub_command(State, User, "") ->
-    option:foreach(
-      fun (Channel) ->
-              Channel ! string_as_user_response(User, "Cannot lookup an empty term")
-      end,
-      State#state.channel),
-    State;
-ub_command(State, User, Term) ->
-    option:foreach(
-      fun(Channel) ->
-              %% TODO(#98): response should include the link to the defintion page
-              Channel ! string_as_user_response(
-                          User,
-                          option:default(
-                            "Could not find the term",
-                            option:map(
-                              fun (Definition) ->
-                                      string:substr(Definition, 1, 200)
-                              end,
-                              option:flat_map(
-                                fun ub_definition:from_http_response/1,
-                                httpc:request(
-                                  "http://api.urbandictionary.com/v0/define?term="
-                                  ++ http_uri:encode(Term))))))
-      end,
-      State#state.channel),
-    State.
+ub_command(User, "") ->
+    string_as_user_response(User, "Cannot lookup an empty term");
+ub_command(User, Term) ->
+    %% TODO(#98): response should include the link to the defintion page
+    string_as_user_response(
+      User,
+      option:default(
+        "Could not find the term",
+        option:map(
+          fun (Definition) ->
+                  string:substr(Definition, 1, 200)
+          end,
+          option:flat_map(
+            fun ub_definition:from_http_response/1,
+            httpc:request(
+              "http://api.urbandictionary.com/v0/define?term="
+              ++ http_uri:encode(Term)))))).
 
 
-hi_command(State, User, _) ->
-    option:foreach(
-      fun (Channel) ->
-              Channel ! {message, "Hello @" ++ User ++ "!"}
-      end,
-      State#state.channel),
-    State.
+hi_command(User, _) ->
+    {message, "Hello @" ++ User ++ "!"}.
 
-fart_command(State, User, "rating") ->
-    option:foreach(
-      fun (Channel) ->
-              Channel ! string_as_user_response(
-                          User,
-                          fart_rating:as_string())
-      end,
-      State#state.channel),
-    State;
-fart_command(State, User, _) ->
-    option:foreach(
-      fun (Channel) ->
-              Channel ! string_as_user_response(User,
-                                                "don't have intestines to perform the operation."),
-              fart_rating:bump_counter(User)
-      end,
-      State#state.channel),
-    State.
+fart_command(User, "rating") ->
+    string_as_user_response(User, fart_rating:as_string());
+fart_command(User, _) ->
+    fart_rating:bump_counter(User),
+    string_as_user_response(User,
+                            "don't have intestines to perform the operation.").
 
-addquote_command(State, User, "") ->
-    option:foreach(
-      fun (Channel) ->
-              Channel ! string_as_user_response(User, "Empty quotes are ignored")
-      end,
-      State#state.channel),
-    State;
-addquote_command(State, User, Quote) ->
-    option:foreach(
-      fun (Channel) ->
-              %% TODO(#109): design a more advanced authentication system for commands
-              Authorized = lists:member(User, ["tsoding", "r3x1m", "bpaf"]),
-              if
-                  Authorized ->
-                      Id = quote_database:add_quote(Quote, User, erlang:timestamp()),
-                      Channel ! string_as_user_response(User, "Added the quote under number " ++ integer_to_list(Id));
-                  true ->
-                      Channel ! string_as_user_response(User, "Nope tsodinNERD")
-              end
-      end,
-      State#state.channel),
-    State.
+addquote_command(User, "") ->
+    string_as_user_response(User, "Empty quotes are ignored");
+addquote_command(User, Quote) ->
+    %% TODO(#109): design a more advanced authentication system for commands
+    Authorized = lists:member(User, ["tsoding", "r3x1m", "bpaf"]),
+    if
+        Authorized ->
+            Id = quote_database:add_quote(Quote, User, erlang:timestamp()),
+            string_as_user_response(User, "Added the quote under number " ++ integer_to_list(Id));
+        true ->
+            string_as_user_response(User, "Nope tsodinNERD")
+    end.
 
-quote_command(State, User, []) ->
-    option:foreach(
-      fun (Channel) ->
-              option:foreach(
-                fun (Quote) ->
-                        Channel ! string_as_user_response(User,
-                                                          Quote#quote.quote
-                                                          ++ " ("
-                                                          ++ integer_to_list(Quote#quote.id)
-                                                          ++ ")")
-                end,
-                quote_database:random())
-      end,
-      State#state.channel),
-    State;
-quote_command(State, User, Arg) ->
-    option:foreach(
-      fun (Channel) ->
-              case string:to_integer(Arg) of
-                  {Id, []} -> option:foreach(
-                                fun (Quote) ->
-                                        Channel ! string_as_user_response(User,
-                                                                          Quote#quote.quote
-                                                                          ++ " ("
-                                                                          ++ integer_to_list(Quote#quote.id)
-                                                                          ++ ")")
-                                end,
-                                quote_database:quote(Id));
-                  _ -> nothing
-              end
-      end,
-      State#state.channel),
-    State.
+quote_command(User, []) ->
+    option:default(
+      {message, "No quotes are found"},
+      option:map(
+        fun (Quote) ->
+                string_as_user_response(User,
+                                        Quote#quote.quote
+                                        ++ " ("
+                                        ++ integer_to_list(Quote#quote.id)
+                                        ++ ")")
+        end,
+        quote_database:random()));
+quote_command(User, Arg) ->
+    case string:to_integer(Arg) of
+        {Id, []} -> option:default(
+                      {message, "tsodinNERD"},
+                      option:map(
+                        fun (Quote) ->
+                                string_as_user_response(User,
+                                                        Quote#quote.quote
+                                                        ++ " ("
+                                                        ++ integer_to_list(Quote#quote.id)
+                                                        ++ ")")
+                        end,
+                        quote_database:quote(Id)));
+        _ -> {message, "tsodinNERD"}
+    end.
 
 
-russify_command(State, User, Text) ->
-    option:foreach(
-     fun(Channel) ->
-             Channel ! string_as_user_response(User,
-                                               gen_server:call(russify, binary:list_to_bin(Text)))
-     end,
-      State#state.channel),
-    State.
+russify_command(User, Text) ->
+    string_as_user_response(User,
+                            gen_server:call(russify, binary:list_to_bin(Text))).
 
-help_command(State, User, "") ->
-   option:foreach(
-     fun (Channel) ->
-             Channel ! string_as_user_response(User,
-                                               "supported commands: "
-                                               ++ string:join(maps:keys(command_table()), ", ")
-                                               ++ ". Source code: https://github.com/tsoding/tsoder")
-     end,
-     State#state.channel),
-    State;
-help_command(State, User, Command) ->
-    option:foreach(
-      fun (Channel) ->
-              case command_table() of
-                  #{ Command := {_, Description} } ->
-                      Channel ! string_as_user_response(User, Description);
-                  _ ->
-                      Channel ! string_as_user_response(User, "never heard of " ++ Command)
-              end
-      end,
-     State#state.channel),
-    State.
+help_command(User, "") ->
+    string_as_user_response(User,
+                            "supported commands: "
+                            ++ string:join(maps:keys(command_table()), ", ")
+                            ++ ". Source code: https://github.com/tsoding/tsoder");
+help_command(User, Command) ->
+    case command_table() of
+        #{ Command := {_, Description} } ->
+            string_as_user_response(User, Description);
+        _ ->
+            string_as_user_response(User, "never heard of " ++ Command)
+    end.
 
 string_as_user_response(User, String) ->
     {message, ["@", User, ", ", String]}.

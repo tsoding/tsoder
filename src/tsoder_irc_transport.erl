@@ -35,13 +35,13 @@ loop(Sock, Channel) ->
                       error_logger:info_msg("Received a PING command from ~s PONGing back~n", [Host]),
                       ssl:send(Sock, "PONG " ++ Host ++ "\n");
                   ({privmsg, User, Msg}) ->
-                      gen_server:cast(tsoder_bot, {message, User, Msg})
+                      case gen_server:call(tsoder_bot, {message, User, Msg}, 1000) of
+                          {message, Message} -> send_message(Sock, Message, Channel);
+                          _ -> nothing
+                      end
               end,
               irc_command:of_line(Data)),
             error_logger:info_msg(Data),
-            loop(Sock, Channel);
-        {message, Message} ->
-            send_message(Sock, Message, Channel),
             loop(Sock, Channel);
         {ssl_error, Sock, Reason} ->
             {error, Reason};
@@ -62,7 +62,10 @@ transport_entry() ->
                              [binary, {packet, 0}]),
 
     authorize(Sock, "TsoderBot", Password, Channel),
-    gen_server:cast(tsoder_bot, {join, self()}),
+    case gen_server:call(tsoder_bot, {join, self()}, 1000) of
+        {message, Message} -> send_message(Sock, Message, Channel);
+        _ -> nothing
+    end,
     ok = loop(Sock, Channel),
     quit(Sock),
 
