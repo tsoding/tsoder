@@ -107,7 +107,7 @@ addquote_command(User, "") ->
     string_as_user_response(User, "Empty quotes are ignored");
 addquote_command(User, Quote) ->
     %% TODO(#109): design a more advanced authentication system for commands
-    Authorized = lists:member(User, ["tsoding", "r3x1m", "bpaf"]),
+    Authorized = lists:member(User, ["tsoding", "r3x1m", "bpaf", "everx80"]),
     if
         Authorized ->
             Id = quote_database:add_quote(Quote, User, erlang:timestamp()),
