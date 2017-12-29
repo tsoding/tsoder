@@ -57,19 +57,8 @@ command_table() ->
      , "addquote" => { fun addquote_command/2, "!addquote <quote> -- add a quote to the quote database" }
      , "quote" => { fun quote_command/2, "!quote [id] -- select a quote from the quote database" }
      , "russify" => { fun russify_command/2, "!russify <western-spy-text> -- russify western spy text" }
-       %% TODO(#114): Implement custom response command system
-       %%
-       %% - `!addcommand <command-name> <text>`
-       %% - `!removecommand <command-name>`
-       %%
-       %% Custom command should have the following signature:
-       %% `!command-name [user]`. Where `[user]` is an optional user
-       %% to mention before the `<text>`. If the user is not provided
-       %% the `<text>` is just sent to the chat w/o mentioning
-       %% anybody/
-       %%
-       %% This command system should replace hardcoded temporary
-       %% commands like !nov2017
+     , "addcom" => { fun addcom_command/2, "!addcom <command-name> <text> -- add custom response command" }
+     , "delcom" => { fun delcom_command/2, "!delcom <command-name> -- remove an existing response command" }
      %% TODO(#115): Design a more advanced mechanism for disabling/enabling commands
      %% , "ub"   => { fun ub_command/3, "!ub [term] -- Lookup the term in Urban Dictionary" }
      }.
@@ -148,6 +137,18 @@ quote_command(User, Arg) ->
 russify_command(User, Text) ->
     string_as_user_response(User,
                             gen_server:call(russify, binary:list_to_bin(Text))).
+
+addcom_command(User, Text) ->
+    error_logger:info_report([addcom,
+                              {user, User},
+                              {text, Text}]),
+    nomessage.
+
+delcom_command(User, Text) ->
+    error_logger:info_report([delcom,
+                              {user, User},
+                              {text, Text}]),
+    nomessage.
 
 help_command(User, "") ->
     string_as_user_response(User,
