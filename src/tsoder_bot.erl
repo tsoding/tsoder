@@ -32,7 +32,7 @@ handle_call({message, User, Message}, _, State) ->
                     #{ Command := { Action, _ } } ->
                         { reply, Action(User, Arguments), State };
                     _ ->
-                        { reply, custom_commands:exec_command(Command), State }
+                        { reply, custom_commands:exec_command(Command, Message), State }
                 end
         end,
         command_parser:from_string(Message)));
@@ -136,17 +136,13 @@ russify_command(User, Text) ->
     string_as_user_response(User,
                             gen_server:call(russify, binary:list_to_bin(Text))).
 
+%% TODO: implement addcom_command
 addcom_command(User, Text) ->
-    error_logger:info_report([addcom,
-                              {user, User},
-                              {text, Text}]),
-    nomessage.
+    string_as_user_response(User, "Not implemented yet").
 
+%% TODO: implement delcom_command
 delcom_command(User, Text) ->
-    error_logger:info_report([delcom,
-                              {user, User},
-                              {text, Text}]),
-    nomessage.
+    string_as_user_response(User, "Not implemented yet").
 
 help_command(User, "") ->
     string_as_user_response(User,
