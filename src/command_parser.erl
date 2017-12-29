@@ -1,7 +1,7 @@
--module(user_command).
--export([of_string/1]).
+-module(command_parser).
+-export([from_string/1]).
 
-of_string(Line) ->
+from_string(Line) ->
     {ok, Regexp} = re:compile("^\\s*\\!(\\w*)( +(.+))?"),
     case re:run(Line, Regexp, [{capture, all, list}]) of
         {match, [_, CmdName]} -> {ok, {CmdName, []}};

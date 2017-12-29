@@ -37,7 +37,7 @@ handle_call({message, User, Message}, _, State) ->
                         { reply, nomessage, State }
                 end
         end,
-        user_command:of_string(Message)));
+        command_parser:from_string(Message)));
 handle_call({join, _}, _, State) ->
     {reply, {message, "I came tsodinNERD"}, State};
 handle_call(_, _, State) ->
