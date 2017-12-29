@@ -9,4 +9,8 @@ of_string_test() ->
     ?assertMatch({ok, {"fart", "something"}},
                  user_command:of_string("!fart something")),
     ?assertMatch({ok, {"nov2017", []}},
-                 user_command:of_string("!nov2017")).
+                 user_command:of_string("!nov2017")),
+    ?assertMatch(error,
+                 user_command:of_string("does !fart rating count toward !fart rating")),
+    ?assertMatch({ok, {"fart", []}},
+                 user_command:of_string("    !fart")).
