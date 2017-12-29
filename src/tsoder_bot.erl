@@ -32,9 +32,7 @@ handle_call({message, User, Message}, _, State) ->
                     #{ Command := { Action, _ } } ->
                         { reply, Action(User, Arguments), State };
                     _ ->
-                        error_logger:info_report({unsupported_command,
-                                                  {Command, Arguments}}),
-                        { reply, nomessage, State }
+                        { reply, custom_commands:exec_command(Command), State }
                 end
         end,
         command_parser:from_string(Message)));
