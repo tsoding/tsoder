@@ -55,11 +55,20 @@ command_table() ->
      , "addquote" => { command_auth(
                          ["tsoding", "r3x1m", "bpaf", "everx80"],
                          fun addquote_command/2)
-                     , "!addquote <quote> -- add a quote to the quote database" }
+                     , "!addquote <quote> -- add a quote to the quote database"
+                     }
      , "quote" => { fun quote_command/2, "!quote [id] -- select a quote from the quote database" }
      , "russify" => { fun russify_command/2, "!russify <western-spy-text> -- russify western spy text" }
-     , "addcom" => { fun addcom_command/2, "!addcom <command-name> <text> -- add custom response command" }
-     , "delcom" => { fun delcom_command/2, "!delcom <command-name> -- remove an existing response command" }
+     , "addcom" => { command_auth(
+                       ["tsoding", "r3x1m"],
+                       fun addcom_command/2)
+                   , "!addcom <command-name> <text> -- add custom response command"
+                   }
+     , "delcom" => { command_auth(
+                       fun delcom_command/2,
+                       ["tsoding", "r3x1m"])
+                   , "!delcom <command-name> -- remove an existing response command"
+                   }
      %% TODO(#115): Design a more advanced mechanism for disabling/enabling commands
      %% , "ub"   => { fun ub_command/3, "!ub [term] -- Lookup the term in Urban Dictionary" }
      }.
