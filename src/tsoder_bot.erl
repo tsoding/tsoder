@@ -67,7 +67,7 @@ command_table() ->
 %% TODO(#109): design a more advanced authentication system for commands
 command_auth(AuthorizedUsers, Command) ->
     fun (User, Args) ->
-            Authorized = lists:member(User, ["tsoding", "r3x1m", "bpaf", "everx80"]),
+            Authorized = lists:member(User, AuthorizedUsers),
             if
                 Authorized -> Command(User, Args);
                 true -> string_as_user_response(User, "Nope tsodinHYPERNERD")
