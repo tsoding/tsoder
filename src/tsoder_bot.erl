@@ -32,7 +32,7 @@ handle_call({message, User, Message}, _, State) ->
                     #{ Command := { Action, _ } } ->
                         { reply, Action(User, Arguments), State };
                     _ ->
-                        { reply, custom_commands:exec_command(Command, Message), State }
+                        { reply, custom_commands:exec_command(Command, Arguments), State }
                 end
         end,
         command_parser:from_string(Message)));

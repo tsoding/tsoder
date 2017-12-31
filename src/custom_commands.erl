@@ -5,10 +5,29 @@
 -include("custom_commands.hrl").
 
 add_command(Name, Response) ->
-    undefined.
+    {atomic, Result} =
+        mnesia:transaction(
+         fun () ->
+                 case mnesia:read(custom_command, Name) of
+                     [_] -> ok = mnesia:write(#custom_command { name = Name
+                                                              , response = Response }),
+                            updated;
+                     [] -> mnesia:write(#custom_command { name = Name
+                                                        , response = Response })
+                 end
+         end),
+    Result.
 
 del_command(Name) ->
-    undefined.
+    {atomic, Result} =
+        mnesia:transaction(
+         fun () ->
+                 case mnesia:read(custom_command, Name) of
+                     [_] -> mnesia:delete({custom_command, Name});
+                     [] -> noexists
+                 end
+         end),
+    Result.
 
 exec_command(Name, Mention) ->
     {atomic, Result} =
