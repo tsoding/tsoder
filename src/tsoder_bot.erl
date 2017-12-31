@@ -32,12 +32,10 @@ handle_call({message, User, Message}, _, State) ->
                     #{ Command := { Action, _ } } ->
                         { reply, Action(User, Arguments), State };
                     _ ->
-                        error_logger:info_report({unsupported_command,
-                                                  {Command, Arguments}}),
-                        { reply, nomessage, State }
+                        { reply, custom_commands:exec_command(Command, Arguments), State }
                 end
         end,
-        user_command:of_string(Message)));
+        command_parser:from_string(Message)));
 handle_call({join, _}, _, State) ->
     {reply, {message, "I came tsodinNERD"}, State};
 handle_call(_, _, State) ->
@@ -54,25 +52,47 @@ command_table() ->
        "hi"   => { fun hi_command/2, "!hi -- says hi to you" }
      , "help" => { fun help_command/2, "!help [command] -- prints the list of supported commands." }
      , "fart" => { fun fart_command/2, "!fart [rating] -- fart" }
-     , "addquote" => { fun addquote_command/2, "!addquote <quote> -- add a quote to the quote database" }
+     , "addquote" => { command_auth(
+                         ["tsoding", "r3x1m", "bpaf", "everx80"],
+                         fun addquote_command/2)
+                     , "!addquote <quote> -- add a quote to the quote database"
+                     }
      , "quote" => { fun quote_command/2, "!quote [id] -- select a quote from the quote database" }
      , "russify" => { fun russify_command/2, "!russify <western-spy-text> -- russify western spy text" }
-       %% TODO(#114): Implement custom response command system
-       %%
-       %% - `!addcommand <command-name> <text>`
-       %% - `!removecommand <command-name>`
-       %%
-       %% Custom command should have the following signature:
-       %% `!command-name [user]`. Where `[user]` is an optional user
-       %% to mention before the `<text>`. If the user is not provided
-       %% the `<text>` is just sent to the chat w/o mentioning
-       %% anybody/
-       %%
-       %% This command system should replace hardcoded temporary
-       %% commands like !nov2017
+     , "addcom" => { command_auth(
+                       ["tsoding", "r3x1m"],
+                       command_args(
+                         "^\\s*(\\w*)\\s*(.+)",
+                         fun addcom_command/2))
+                   , "!addcom <command-name> <text> -- add custom response command"
+                   }
+     , "delcom" => { command_auth(
+                       ["tsoding", "r3x1m"],
+                       fun delcom_command/2)
+                   , "!delcom <command-name> -- remove an existing response command"
+                   }
      %% TODO(#115): Design a more advanced mechanism for disabling/enabling commands
      %% , "ub"   => { fun ub_command/3, "!ub [term] -- Lookup the term in Urban Dictionary" }
      }.
+
+%% TODO(#109): design a more advanced authentication system for commands
+command_auth(AuthorizedUsers, Command) ->
+    fun (User, Args) ->
+            Authorized = lists:member(User, AuthorizedUsers),
+            if
+                Authorized -> Command(User, Args);
+                true -> string_as_user_response(User, "Nope tsodinHYPERNERD")
+            end
+    end.
+
+command_args(RegexpString, Command) ->
+    {ok, Regexp} = re:compile(RegexpString),
+    fun (User, Message) ->
+            case re:run(Message, Regexp, [{capture, all, list}]) of
+                {match, [_ | Args]} -> Command(User, Args);
+                nomatch -> string_as_user_response(User, "Incorrect command syntax")
+            end
+    end.
 
 ub_command(User, "") ->
     string_as_user_response(User, "Cannot lookup an empty term");
@@ -106,15 +126,8 @@ fart_command(User, _) ->
 addquote_command(User, "") ->
     string_as_user_response(User, "Empty quotes are ignored");
 addquote_command(User, Quote) ->
-    %% TODO(#109): design a more advanced authentication system for commands
-    Authorized = lists:member(User, ["tsoding", "r3x1m", "bpaf", "everx80"]),
-    if
-        Authorized ->
-            Id = quote_database:add_quote(Quote, User, erlang:timestamp()),
-            string_as_user_response(User, "Added the quote under number " ++ integer_to_list(Id));
-        true ->
-            string_as_user_response(User, "Nope tsodinNERD")
-    end.
+    Id = quote_database:add_quote(Quote, User, erlang:timestamp()),
+    string_as_user_response(User, "Added the quote under number " ++ integer_to_list(Id)).
 
 quote_command(User, []) ->
     option:default(
@@ -148,6 +161,18 @@ quote_command(User, Arg) ->
 russify_command(User, Text) ->
     string_as_user_response(User,
                             gen_server:call(russify, binary:list_to_bin(Text))).
+
+addcom_command(User, [Name, Response]) ->
+    case custom_commands:add_command(Name, Response) of
+        ok -> string_as_user_response(User, ["Command !", Name, " has been added"]);
+        updated -> string_as_user_response(User, ["Command !", Name, " has been updated"])
+    end.
+
+delcom_command(User, Name) ->
+    case custom_commands:del_command(Name) of
+        ok -> string_as_user_response(User, ["Command !", Name, " has been removed."]);
+        noexists -> string_as_user_response(User, ["Command !", Name, " doesn't exist."])
+    end.
 
 help_command(User, "") ->
     string_as_user_response(User,

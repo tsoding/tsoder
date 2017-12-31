@@ -23,7 +23,7 @@ join_test_() ->
                           ?assertMatch({message, [ "@"
                                                  , "khooy"
                                                  , ", "
-                                                 , "supported commands: addquote, fart, help, hi, quote, russify. Source code: https://github.com/tsoding/tsoder"]},
+                                                 , "supported commands: addcom, addquote, delcom, fart, help, hi, quote, russify. Source code: https://github.com/tsoding/tsoder"]},
                                        gen_server:call(tsoder_bot, {message, "khooy", "!help"}))
                       end)},
               {timeout, 1,

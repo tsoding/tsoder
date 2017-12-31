@@ -12,6 +12,7 @@
 -include("fart_rating.hrl").
 -include("quote_database.hrl").
 -include("unique_ids.hrl").
+-include("custom_commands.hrl").
 
 %%====================================================================
 %% API
@@ -53,5 +54,11 @@ migrations() ->
                  mnesia:create_table(quote,
                                      [{attributes, record_info(fields, quote)},
                                       {disc_only_copies, [node()]}]),
+                 ok
+         end},
+     {2, fun () ->
+                 {atomic, ok} = mnesia:create_table(custom_command,
+                                                    [{attributes, record_info(fields, custom_command)},
+                                                     {disc_only_copies, [node()]}]),
                  ok
          end}].
