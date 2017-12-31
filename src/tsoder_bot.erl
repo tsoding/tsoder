@@ -61,12 +61,14 @@ command_table() ->
      , "russify" => { fun russify_command/2, "!russify <western-spy-text> -- russify western spy text" }
      , "addcom" => { command_auth(
                        ["tsoding", "r3x1m"],
-                       fun addcom_command/2)
+                       command_args(
+                         "^\\s*(\\w*)\\s*(.+)",
+                         fun addcom_command/2))
                    , "!addcom <command-name> <text> -- add custom response command"
                    }
      , "delcom" => { command_auth(
-                       fun delcom_command/2,
-                       ["tsoding", "r3x1m"])
+                       ["tsoding", "r3x1m"],
+                       fun delcom_command/2)
                    , "!delcom <command-name> -- remove an existing response command"
                    }
      %% TODO(#115): Design a more advanced mechanism for disabling/enabling commands
@@ -80,6 +82,15 @@ command_auth(AuthorizedUsers, Command) ->
             if
                 Authorized -> Command(User, Args);
                 true -> string_as_user_response(User, "Nope tsodinHYPERNERD")
+            end
+    end.
+
+command_args(RegexpString, Command) ->
+    {ok, Regexp} = re:compile(RegexpString),
+    fun (User, Message) ->
+            case re:run(Message, Regexp, [{capture, all, list}]) of
+                {match, [_ | Args]} -> Command(User, Args);
+                nomatch -> string_as_user_response(User, "Incorrect command syntax")
             end
     end.
 
@@ -151,13 +162,17 @@ russify_command(User, Text) ->
     string_as_user_response(User,
                             gen_server:call(russify, binary:list_to_bin(Text))).
 
-%% TODO: implement addcom_command
-addcom_command(User, Text) ->
-    string_as_user_response(User, "Not implemented yet").
+addcom_command(User, [Name, Response]) ->
+    case custom_commands:add_command(Name, Response) of
+        ok -> string_as_user_response(User, ["Command !", Name, " has been added"]);
+        updated -> string_as_user_response(User, ["Command !", Name, " has been updated"])
+    end.
 
-%% TODO: implement delcom_command
-delcom_command(User, Text) ->
-    string_as_user_response(User, "Not implemented yet").
+delcom_command(User, Name) ->
+    case custom_commands:del_command(Name) of
+        ok -> string_as_user_response(User, ["Command !", Name, " has been removed."]);
+        noexists -> string_as_user_response(User, ["Command !", Name, " doesn't exist."])
+    end.
 
 help_command(User, "") ->
     string_as_user_response(User,
