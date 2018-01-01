@@ -4,7 +4,8 @@
          defined/1,
          filter/2,
          foreach/2,
-         default/2]).
+         default/2,
+         custom/2]).
 
 map(F, {ok, Value}) ->
     {ok, F(Value)};
@@ -38,3 +39,7 @@ default(_, {ok, Value}) ->
     Value;
 default(Default, _) ->
     Default.
+
+custom(CustomOk, {CustomOk, Value}) ->
+    {ok, Value};
+custom(_, X) -> X.
