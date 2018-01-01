@@ -41,48 +41,53 @@ help_command_test_() ->
       [{timeout, 1,
         ?_test(begin
                    ?assertMatch(
-                        { message,
-                          "@khooy, "
-                          "supported commands: "
-                          "addcom, addquote, delcom, "
-                          "fart, help, hi, quote, russify"
-                          ". Source code: https://github.com/tsoding/tsoder" },
-                      flatten_message(
-                        gen_server:call(
-                          tsoder_bot,
-                          {message, "khooy", "!help"})))
+                      { ok,
+                        "@khooy, "
+                        "supported commands: "
+                        "addcom, addquote, delcom, "
+                        "fart, help, hi, quote, russify"
+                        ". Source code: https://github.com/tsoding/tsoder" },
+                      option:map(
+                        fun lists:flatten/1,
+                        option:custom(
+                          message,
+                          gen_server:call(
+                            tsoder_bot,
+                            {message, "khooy", "!help"}))))
                end)},
        {timeout, 1,
         ?_test(begin
                    ?assertMatch(
-                      { message,
+                      { ok,
                         "@khooy, "
                         "!help [command] -- "
                         "prints the list of supported commands."},
-                      flatten_message(
-                        gen_server:call(
-                          tsoder_bot,
-                          {message, "khooy", "!help help"})))
+                      option:map(
+                        fun lists:flatten/1,
+                        option:custom(
+                          message,
+                          gen_server:call(
+                            tsoder_bot,
+                            {message, "khooy", "!help help"}))))
                end)},
        {timeout, 1,
         ?_test(begin
                    ?assertMatch(
-                      { message,
+                      { ok,
                         "@khooy, never heard of khooy" },
-                      flatten_message(
-                        gen_server:call(
-                          tsoder_bot,
-                          {message, "khooy", "!help khooy"})))
+                      option:map(
+                        fun lists:flatten/1,
+                        option:custom(
+                          message,
+                          gen_server:call(
+                            tsoder_bot,
+                            {message, "khooy", "!help khooy"}))))
                end)}]).
 
-%% INTERNAL %%
+%% FIXTURES %%
 
 tsoder_bot_fixture(Test) ->
     {setup,
      fun tsoder_bot:start_link/0,
      fun (_) -> gen_server:stop(tsoder_bot) end,
      Test}.
-
-flatten_message({message, Message}) ->
-    {message, lists:flatten(Message)};
-flatten_message(X) -> X.
