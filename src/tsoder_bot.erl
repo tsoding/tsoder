@@ -183,11 +183,13 @@ bttv_command(User, _) ->
           fun ({_, _, Body}) ->
                   {BttvResponse} = jiffy:decode(Body),
                   ["Available BTTV emotes: ",
-                   lists:map(
-                     fun ({Emote}) ->
-                             proplists:get_value(<<"code">>, Emote)
-                     end,
-                     proplists:get_value(<<"emotes">>, BttvResponse))]
+                   lists:join(
+                     " ",
+                     lists:map(
+                       fun ({Emote}) ->
+                               proplists:get_value(<<"code">>, Emote)
+                       end,
+                       proplists:get_value(<<"emotes">>, BttvResponse)))]
           end,
           httpc:request("https://api.betterttv.net/2/channels/tsoding")),
     case EmotesResponse of
