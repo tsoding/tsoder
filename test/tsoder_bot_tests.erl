@@ -23,7 +23,7 @@ join_test_() ->
       [{timeout, 1,
         ?_test(begin
                    ?assertMatch(
-                      {message, "I came tsodinNERD"},
+                      {message, "I came! HyperNyard"},
                       gen_server:call(tsoder_bot, {join, self()}))
                end)}]).
 
