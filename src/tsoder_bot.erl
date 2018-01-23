@@ -37,7 +37,7 @@ handle_call({message, User, Message}, _, State) ->
         end,
         command_parser:from_string(Message)));
 handle_call({join, _}, _, State) ->
-    {reply, {message, "I came tsodinNERD"}, State};
+    {reply, {message, "I came! HyperNyard"}, State};
 handle_call(_, _, State) ->
     {reply, unsupported, State}.
 
@@ -81,7 +81,7 @@ command_auth(AuthorizedUsers, Command) ->
             Authorized = lists:member(User, AuthorizedUsers),
             if
                 Authorized -> Command(User, Args);
-                true -> string_as_user_response(User, "Nope tsodinHYPERNERD")
+                true -> string_as_user_response(User, "Nope HyperNyard")
             end
     end.
 
