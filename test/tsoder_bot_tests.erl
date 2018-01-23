@@ -44,7 +44,7 @@ help_command_test_() ->
                       { ok,
                         "@khooy, "
                         "supported commands: "
-                        "addcom, addquote, delcom, "
+                        "addcom, addquote, bttv, delcom, "
                         "fart, help, hi, quote, russify"
                         ". Source code: https://github.com/tsoding/tsoder" },
                       option:map(

@@ -71,6 +71,9 @@ command_table() ->
                        fun delcom_command/2)
                    , "!delcom <command-name> -- remove an existing response command"
                    }
+     , "bttv" => { fun bttv_command/2
+                 , "!bttv -- show all of the available BTTV emotes for the channel"
+                 }
      %% TODO(#115): Design a more advanced mechanism for disabling/enabling commands
      %% , "ub"   => { fun ub_command/3, "!ub [term] -- Lookup the term in Urban Dictionary" }
      }.
@@ -172,6 +175,24 @@ delcom_command(User, Name) ->
     case custom_commands:del_command(Name) of
         ok -> string_as_user_response(User, ["Command !", Name, " has been removed."]);
         noexists -> string_as_user_response(User, ["Command !", Name, " doesn't exist."])
+    end.
+
+bttv_command(User, _) ->
+    EmotesResponse =
+        option:map(
+          fun ({_, _, Body}) ->
+                  {BttvResponse} = jiffy:decode(Body),
+                  ["Available BTTV emotes: ",
+                   lists:map(
+                     fun ({Emote}) ->
+                             proplists:get_value(<<"code">>, Emote)
+                     end,
+                     proplists:get_value(<<"emotes">>, BttvResponse))]
+          end,
+          httpc:request("https://api.betterttv.net/2/channels/tsoding")),
+    case EmotesResponse of
+        {ok, Response} -> string_as_user_response(User, Response);
+        Error -> error_logger:error_report(Error)
     end.
 
 help_command(User, "") ->
